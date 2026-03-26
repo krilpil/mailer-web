@@ -1,68 +1,47 @@
 'use client';
 
-import React from 'react';
-import { FormProps } from 'antd';
+import React, { FC } from 'react';
+import { JSONContent, useEditor } from '@tiptap/react';
+import { TextAreaProps } from 'antd/es/input';
 
-import { useSendMail } from '@/entities/mailer/api';
+import { EditorBubbleMenu, EditorFloatingMenu, EditorPositionMenu } from '@/entities/mailer';
 
-import {
-  SActions,
-  SForm,
-  SFormItem,
-  SMailerEditor,
-  SMessageArea,
-  SRecipientInput,
-  SSendButton,
-} from './MailerEditor.styles';
+import { SEditorContent, SHeading, SMailerEditor } from './MailerEditor.styles';
+import { editorExtensions } from '../lib/editorConfig';
 
-export type MailerFormValues = {
-  recipient: string;
-  message: string;
-};
+export interface MailerEditorProps {
+  title: string;
+  content: JSONContent;
+  onUpdateTitle: (title: string) => void;
+  onUpdateContent: (content: JSONContent) => void;
+}
 
-export const MailerEditor = () => {
-  const sendMail = useSendMail();
+export const MailerEditor: FC<MailerEditorProps> = ({
+  title,
+  content,
+  onUpdateTitle,
+  onUpdateContent,
+}) => {
+  const editor = useEditor({
+    immediatelyRender: false,
+    content,
+    extensions: editorExtensions,
+    onUpdate: ({ editor }) => {
+      onUpdateContent(editor.getJSON());
+    },
+  });
 
-  const handleSendMail: FormProps<MailerFormValues>['onFinish'] = ({ recipient, message }) => {
-    sendMail.mutateAsync({
-      recipient,
-      attribs: {
-        html: message,
-      },
-    });
+  const handleChangeHeading: TextAreaProps['onChange'] = (event) => {
+    onUpdateTitle(event.target.value);
   };
 
   return (
-    <SMailerEditor>
-      <SForm
-        layout="vertical"
-        onFinish={handleSendMail}
-        initialValues={{ recipient: 'krilpil@vk.com', message: '' }}
-      >
-        <SFormItem
-          label="Получатель"
-          name="recipient"
-          rules={[{ required: true, message: 'Укажите получателя' }]}
-        >
-          <SRecipientInput placeholder="email@domain.com" />
-        </SFormItem>
-
-        <SFormItem
-          label="Сообщение"
-          name="message"
-          rules={[{ required: true, message: 'Введите текст письма' }]}
-        >
-          <SMessageArea autoSize={{ minRows: 6, maxRows: 12 }} placeholder="Введите текст письма" />
-        </SFormItem>
-
-        <SActions>
-          <SSendButton htmlType="submit" loading={sendMail.isPending} type="primary">
-            Отправить
-          </SSendButton>
-        </SActions>
-      </SForm>
-
-      {sendMail.data && <p>{sendMail.data.msg}</p>}
+    <SMailerEditor data-editor-root>
+      <SHeading value={title} onChange={handleChangeHeading} />
+      <EditorFloatingMenu editor={editor} />
+      <EditorPositionMenu editor={editor} />
+      <EditorBubbleMenu editor={editor} />
+      <SEditorContent editor={editor} />
     </SMailerEditor>
   );
 };

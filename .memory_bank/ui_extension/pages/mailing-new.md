@@ -4,7 +4,7 @@
 - Приватная страница создания новой рассылки.
 
 ## Компоненты/виджеты
-- `NewMailingPage` (screen): `src/screens/NewMailingPage/ui/NewMailingPage.tsx`.
+- `NewMailingPage` (screen): `src/screens/NewMailingPage/ui/MailingPage.tsx`.
 - `MailerEditor` (widget): `src/widgets/MailerEditor/ui/MailerEditor.tsx`.
 
 ## Входы/выходы данных

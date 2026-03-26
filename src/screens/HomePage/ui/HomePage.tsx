@@ -7,7 +7,7 @@ import { MailerEditor } from '@/widgets/MailerEditor';
 export const HomePage = () => {
   return (
     <div>
-      <MailerEditor />
+      <h1>Аналитика и дашборды</h1>
     </div>
   );
 };
