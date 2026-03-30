@@ -39,12 +39,16 @@ export const MailingPage = () => {
 
   return (
     <SMailingPage>
-      <MailerEditor
-        title={title}
-        content={content}
-        onUpdateTitle={setTitle}
-        onUpdateContent={setContent}
-      />
+      <div>
+        <MailerEditor
+          title={title}
+          content={content}
+          onUpdateTitle={setTitle}
+          onUpdateContent={setContent}
+        />
+
+        <p>{JSON.stringify(content)}</p>
+      </div>
 
       <SMetaContent>
         <Button

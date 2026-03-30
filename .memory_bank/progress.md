@@ -1,9 +1,27 @@
 # Progress
 
 ## Status
-- Базовая документация и Memory Bank заполнены; добавлен эндпоинт обновления DNS записей; сформирован SQL для таблицы доменов аккаунта и уточнён тип `accounts.id`; добавлено сохранение домена и фильтрация списка по `account_domain`; включена проверка JWT для API; подготовлен SQL для `account_mailbox` с уникальным `username` и жёсткой привязкой домена; требуется UNIQUE/PK на `(account_id, domain)` в `account_domain`; добавлена запись mailbox при создании домена; добавлены приватные страницы `/mailboxes` и `/mailing/new`; добавлены серверный/клиентский эндпоинты списка mailbox и таблица на странице; добавлен эндпоинт удаления mailbox с проверкой доступа; добавлен OTP-флоу создания mailbox; `deleteDomain` терпимо обрабатывает отсутствие mailbox; добавлены модульные заметки для доменов и mailbox; базовый перенос `MailerEditor` завершён без store и без кастомных NodeView; добавлены `EditorFloatingMenu`, `EditorPositionMenu`, `EditorBubbleMenu` с логикой из `frontend_employee`, адаптированной под базовые extension’ы; `AddRecipientMailer` получил рабочий UI управления списком email-получателей; устранены предупреждения AntD/Tiptap и ранний доступ к `editor.view`; `title/content` редактора вынесены на уровень `MailingPage`; добавлен базовый `EmailTemplate` на `@react-email/components` с типизированными пропсами и дефолтами; реализован рендер TipTap `JSONContent` в `EmailTemplate` и подключена передача `content` из `MailingPage` в рендер письма.
+- Базовая документация и Memory Bank заполнены; добавлен эндпоинт обновления DNS записей; сформирован SQL для таблицы доменов аккаунта и уточнён тип `accounts.id`; добавлено сохранение домена и фильтрация списка по `account_domain`; включена проверка JWT для API; подготовлен SQL для `account_mailbox` с уникальным `username` и жёсткой привязкой домена; требуется UNIQUE/PK на `(account_id, domain)` в `account_domain`; добавлена запись mailbox при создании домена; добавлены приватные страницы `/mailboxes` и `/mailing/new`; добавлены серверный/клиентский эндпоинты списка mailbox и таблица на странице; добавлен эндпоинт удаления mailbox с проверкой доступа; добавлен OTP-флоу создания mailbox; `deleteDomain` терпимо обрабатывает отсутствие mailbox; добавлены модульные заметки для доменов и mailbox; базовый перенос `MailerEditor` завершён без store и без кастомных NodeView; добавлены `EditorFloatingMenu`, `EditorPositionMenu`, `EditorBubbleMenu` с логикой из `frontend_employee`, адаптированной под базовые extension’ы; `AddRecipientMailer` получил рабочий UI управления списком email-получателей; устранены предупреждения AntD/Tiptap и ранний доступ к `editor.view`; `title/content` редактора вынесены на уровень `MailingPage`; добавлен базовый `EmailTemplate` на `@react-email/components` с типизированными пропсами и дефолтами; реализован рендер TipTap `JSONContent` в `EmailTemplate` и подключена передача `content` из `MailingPage` в рендер письма; в `EditorBubbleMenu` добавлена авто-нормализация URL (`https://` для ссылок без протокола); добавлены серверные и клиентские endpoint групп контактов (`create/delete/list/import/remove recipient`) с проверкой доступа по `account_recipient`; реализована страница `/contacts` с таблицей групп, просмотром пользователей группы и удалением пользователей из выбранной группы.
 
 ## Completed
+- В `SettingContacts` реализован импорт пользователей из файла рядом с ручным добавлением (та же архитектура, что в `CreateContactGroup`).
+- Создан общий модуль `entities/contact/lib/recipientsImport.ts` и общий UI-блок `entities/contact/ui/RecipientsImportFileInput` для исключения дублирования логики file-import.
+- В `CreateContactGroup` реализован предпросмотр импорта: при выборе файла распознанные email автоматически добавляются в поле ручного списка пользователей.
+- В `CreateContactGroup` удалено поле `description`, добавлен импорт пользователей из файла (`csv/txt/xls/xlsx`, до 20 Мб).
+- `POST /api/contact/group/import` расширен: поддерживает режимы paste-import (`recipients`) и file-import (`file_data` + `file_type`).
+- `GET /api/contact/group/list` расширен: в ответ добавлен `recipients_count` по каждой группе (получение из BillionMail `/api/contact/group/list` на сервере).
+- В таблицу групп на `/contacts` добавлена колонка с количеством пользователей в группе (`N шт.`).
+- Добавлена возможность удалить пользователя из группы: endpoint `POST /api/contact/group/recipient/remove`, клиентский хук `useRemoveContactFromGroup`, кнопка `Удалить из группы` в модальном окне пользователей.
+- Добавлена feature `CreateContactGroup` и подключена на `/contacts`: кнопка с модальным окном, поля `name/recipients`, создание группы и добавление пользователей.
+- Добавлена приватная страница `Контакты` (`/contacts`): route, screen, widget `SettingContacts`, навигация в `SideMenu`, `routes.CONTACTS_PAGE`.
+- Добавлен `GET /api/contact/group/contacts` с серверной пагинацией по BillionMail `/api/contact/list_ndp` и проверкой доступа к группе через `account_recipient`.
+- В `entities/contact/api` добавлен `useGetContactGroupContacts` для получения пользователей выбранной группы.
+- Добавлен route-group `src/app/api/(contacts)` с endpoint групп контактов: `POST /api/contact/group/create`, `POST /api/contact/group/delete`, `GET /api/contact/group/list`, `POST /api/contact/group/import`.
+- В `createGroup` добавлена генерация `group_id` из `account_id + name + guid` и проверка уникальности по `account_recipient`.
+- Добавлены сервисы BillionMail для `contact/group/create`, `contact/group/delete`, `contact/group/import`.
+- Добавлена клиентская сущность `src/entities/contact` с хуками `useGetContactGroupsList`, `useCreateContactGroup`, `useDeleteContactGroup`, `useImportContactGroupRecipients`.
+- Добавлен модульный файл `.memory_bank/modules/contact-groups.md`, обновлены `docs/API.md` и `README.md`.
+- В `EditorBubbleMenu` добавлена нормализация URL перед `setLink`: при отсутствии схемы ссылка дополняется `https://`.
 - В `EmailTemplate` реализован рендер `content: JSONContent` в `react-email` блоки (heading, paragraph, list, image, hr, code, text marks/link).
 - В `MailingPage` передача `content` в `<EmailTemplate />` добавлена в сценарии генерации HTML (`@react-email/render`).
 - Добавлен `src/entities/mailer/ui/EmailTemplate/EmailTemplate.tsx` как базовый шаблон письма на `@react-email/components`.
@@ -49,6 +67,26 @@
 - `yarn lint` падает: `next lint` не принимает `--fix` в текущей версии.
 
 ## Changelog
+- В `SettingContacts` добавлен импорт из файла (`csv/txt/xls/xlsx`, до 20 Мб) рядом с ручным добавлением пользователей.
+- Логика импорта из файла (парсинг, предпросмотр, валидация, payload) вынесена в общий модуль `entities/contact/lib/recipientsImport.ts` и переиспользуется в `CreateContactGroup` и `SettingContacts`.
+- В `CreateContactGroup` после загрузки файла распознанные email отображаются в списке пользователей (поле ручного ввода).
+- В `CreateContactGroup` добавлен файл-импорт контактов (`csv/txt/xls/xlsx`, до 20 Мб), поле `description` удалено.
+- В серверном/клиентском контракте `POST /api/contact/group/import` добавлены поля `file_data` и `file_type` для импорта из файла.
+- Серверный `GET /api/contact/group/list` теперь возвращает список групп с полем `recipients_count`, поэтому фронт не делает отдельные запросы по группам для подсчета.
+- На странице `/contacts` в таблице групп добавлена колонка количества пользователей (`Пользователей`, `N шт.`).
+- Добавлен endpoint `POST /api/contact/group/recipient/remove`: удаляет пользователя из выбранной группы, а если это последняя группа пользователя, удаляет контакт из BillionMail.
+- В `SettingContacts` добавлена кнопка `Удалить из группы` для каждого пользователя в модальном списке группы.
+- В `SettingContacts` добавлена возможность добавлять новых пользователей в уже созданную группу через `POST /api/contact/group/import` из модального окна группы.
+- Для импорта в группы включен режим подтверждения по умолчанию: `POST /api/contact/group/import` теперь отправляет `status=1` (Confirmed).
+- В `POST /api/contact/group/delete` добавлена верификация фактического удаления группы в BillionMail и повторные попытки; локальная запись удаляется только после подтверждённого удаления группы у провайдера.
+- Исправлена ошибка `Group <id> does not exist` при `POST /api/contact/group/import`: добавлен recovery устаревшего `group_id` по имени группы и повтор импорта; в `createGroup` сохраняется резолвленный `group_id` провайдера.
+- На страницу `/contacts` добавлена feature создания группы с пользователями через модальное окно.
+- В `GET /api/contact/group/list` убран временный soft-fail fallback, упрощена обработка rows и восстановлена строгая ошибка `500` только при фактическом сбое чтения БД.
+- Добавлена страница `/contacts` с таблицей групп и модальным просмотром пользователей группы.
+- Добавлен endpoint `GET /api/contact/group/contacts` и клиентский hook для загрузки пользователей выбранной группы.
+- Добавлены серверные endpoint контактных групп и импорт получателей (`/api/contact/group/create|delete|list|import`) с локальной привязкой к `account_recipient`.
+- Добавлен клиентский API-слой `entities/contact` для списка/создания/удаления групп и импорта получателей.
+- В `EditorBubbleMenu` реализовано автоматическое добавление `https://` для ссылок без протокола.
 - Добавлена обработка TipTap `JSONContent` в `EmailTemplate` с конвертацией узлов редактора в структуру письма на `react-email`.
 - Добавлена передача `content` в `EmailTemplate` при отправке письма из `MailingPage`.
 - Добавлен базовый шаблон `EmailTemplate` для mailer-сущности на `react-email` компонентах.
@@ -73,5 +111,5 @@
 - Добавлены модульные заметки для доменов и mailbox в `.memory_bank/modules/`.
 
 ## Контроль изменений
-- last_checked_commit: 915533372926d80dd5735fe1e0700b0bd5ee0364
-- last_checked_date: 2026-03-26
+- last_checked_commit: 9c548e86bd8798c3b355046176ddefbabef17182
+- last_checked_date: 2026-03-30

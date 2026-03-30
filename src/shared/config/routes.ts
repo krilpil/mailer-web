@@ -5,6 +5,7 @@ export const routes = {
 
   HOME_PAGE: '/',
   NEW_MAILING_PAGE: '/mailing',
+  CONTACTS_PAGE: '/contacts',
   MAILBOXES_PAGE: '/mailboxes',
   SETTINGS_PAGE: '/settings',
 } as const;

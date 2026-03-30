@@ -4,7 +4,7 @@ import { Button, Dropdown } from 'antd';
 export const SEditorPositionMenu = styled.div`
   position: absolute;
   transform: translate(-100%, -50%);
-  left: -12px;
+  left: 24px;
   z-index: 999;
 `;
 

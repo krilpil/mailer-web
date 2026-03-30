@@ -22,6 +22,13 @@ const iconUnderline = <FontAwesomeIcon icon={faUnderline} />;
 const iconStrikethrough = <FontAwesomeIcon icon={faStrikethrough} />;
 const iconLink = <FontAwesomeIcon icon={faLink} />;
 
+const normalizeLink = (link: string) => {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(link)) return link;
+  if (link.startsWith('//')) return `https:${link}`;
+
+  return `https://${link}`;
+};
+
 export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = ({ editor }) => {
   const [isOpenInputLink, setOpenInputLink] = useState(false);
   const [textInputLink, setTextInputLink] = useState('');
@@ -103,7 +110,9 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = ({ editor }) => {
     const link = textInputLink.trim();
 
     if (link) {
-      editor?.chain().focus().extendMarkRange('link').setLink({ href: link }).run();
+      const normalizedLink = normalizeLink(link);
+
+      editor?.chain().focus().extendMarkRange('link').setLink({ href: normalizedLink }).run();
     } else {
       editor?.chain().focus().unsetLink().run();
     }
@@ -124,7 +133,12 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = ({ editor }) => {
 
   return (
     <SBubbleMenu editor={editor} shouldShow={handleShouldShow} options={bubbleOptions}>
-      <SFormattingButton type={typeButtonBold} onClick={handleBold} icon={iconBold} title="Жирный" />
+      <SFormattingButton
+        type={typeButtonBold}
+        onClick={handleBold}
+        icon={iconBold}
+        title="Жирный"
+      />
       <SFormattingButton
         type={typeButtonItalic}
         onClick={handleItalic}
@@ -143,7 +157,12 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = ({ editor }) => {
         icon={iconStrikethrough}
         title="Зачеркнутый"
       />
-      <SFormattingButton type={typeButtonLink} onClick={handleLink} icon={iconLink} title="Ссылка" />
+      <SFormattingButton
+        type={typeButtonLink}
+        onClick={handleLink}
+        icon={iconLink}
+        title="Ссылка"
+      />
 
       {isOpenInputLink && (
         <SInputLink

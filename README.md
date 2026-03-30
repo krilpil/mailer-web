@@ -10,16 +10,18 @@
 - Документация и память: `docs/`, `.memory_bank/`.
 
 ## Маршруты и страницы верхнего уровня
-- Приватные: `src/app/(private)/page.tsx`, `src/app/(private)/mailing/new/page.tsx`, `src/app/(private)/mailboxes/page.tsx`, `src/app/(private)/settings/page.tsx`.
+- Приватные: `src/app/(private)/page.tsx`, `src/app/(private)/mailing/page.tsx`, `src/app/(private)/contacts/page.tsx`, `src/app/(private)/mailboxes/page.tsx`, `src/app/(private)/settings/page.tsx`.
 - Публичные: `src/app/(public)/sign-in/page.tsx`, `src/app/(public)/sign-up/page.tsx`.
 
 ## Ключевые модули
 - `src/app/` — точки входа App Router и группировка маршрутов.
 - `src/app/api/` — серверные API эндпоинты.
+  - Включает route groups: `(auth)`, `(contacts)`, `(domains)`, `(mailing)`, `(mailboxes)`.
 - `src/screens/` — страницы (слой экранов).
 - `src/widgets/` — составные UI-блоки.
 - `src/features/` — функциональные модули.
 - `src/entities/` — доменные сущности и их UI/API.
+  - В том числе `src/entities/contact` для клиентских API групп контактов.
 - `src/shared/` — общие утилиты, типы, API-клиент.
 - `src/auth.ts` — конфигурация аутентификации.
 - `src/proxy.ts` — проксирование запросов.

@@ -46,18 +46,6 @@ export const getContentMenu = ({ editor }: IGetFloatingMenu): MenuProps['items']
       onClick: () => editor?.chain().focus().toggleHeading({ level: 3 }).run(),
     },
     {
-      label: getLabel('Изображение', <FontAwesomeIcon icon={faImage} />),
-      key: 'image',
-      onClick: () => {
-        if (!editor) return;
-
-        const url = window.prompt('Введите URL изображения');
-        if (!url) return;
-
-        editor.chain().focus().setImage({ src: url.trim() }).run();
-      },
-    },
-    {
       label: getLabel('Маркированный список', <FontAwesomeIcon icon={faListUl} />),
       key: 'bullet-list',
       onClick: () => editor?.chain().focus().toggleBulletList().run(),

@@ -2,7 +2,7 @@
 
 ## Overview
 - Server API lives in `src/app/api` (Next.js App Router).
-- We use feature-scoped route groups: `(auth)`, `(domains)`, `(mailing)`, `(mailboxes)`.
+- We use feature-scoped route groups: `(auth)`, `(contacts)`, `(domains)`, `(mailing)`, `(mailboxes)`.
 - Route groups in parentheses are not part of the URL.
 - Public URL paths are defined by the folders under each route group.
 
@@ -85,6 +85,38 @@ Example: `src/app/api/(auth)/sign-up/otp/route.ts` → `POST /api/sign-up/otp`.
 - Request: `{ username }`
 - Response: `{ success, msg }`
 - Notes: checks mailbox access for the account before calling provider API.
+
+## Contact Groups
+`POST /api/contact/group/create`
+- Request: `{ name, description?, double_optin? }`
+- Response: `{ success, msg, data }` where `data` contains `{ group_id, name }`
+- Notes: generates `group_id` from `account_id + name + guid`, checks collision in `account_recipient`, creates group in BillionMail, stores mapping in `account_recipient`.
+
+`POST /api/contact/group/delete`
+- Request: `{ group_id }`
+- Response: `{ success, msg }`
+- Notes: checks group ownership in `account_recipient`, deletes all contacts of this group in BillionMail (`/api/contact/delete_ndp`), then deletes the group in BillionMail, verifies it via `/api/contact/group/info`, and only then deletes local mapping.
+
+`GET /api/contact/group/list`
+- Response: `{ success, msg, data }` where `data.list` contains `{ group_id, name, recipients_count }`.
+- Notes: returns groups from local `account_recipient` for current account and enriches each group with recipient count from BillionMail `/api/contact/group/list`.
+
+`POST /api/contact/group/import`
+- Request: `{ group_ids, recipients?, file_data?, file_type?, default_active?, status?, overwrite? }`
+- Response: `{ success, msg, data? }` where `data.imported_count` is imported recipient count.
+- Notes: validates ownership for all `group_ids` via `account_recipient` and forwards to BillionMail `/api/contact/group/import`; supports both paste-import (`recipients`) and file-import (`file_data` + `file_type` where `file_type` is `csv|txt|excel`); server enforces imported contacts as confirmed (`status=1`).
+
+`GET /api/contact/group/contacts`
+- Query: `{ group_id }`
+- Response: `{ success, msg, data }` where `data.list` contains group contacts (`email`, `active`, `status`, `create_time`).
+- Notes: checks ownership of `group_id` in `account_recipient`, fetches all pages from BillionMail `/api/contact/list_ndp` with `active=-1`.
+
+`POST /api/contact/group/recipient/remove`
+- Request: `{ group_id, email, active }`
+- Response: `{ success, msg, error? }`
+- Notes: checks group ownership in `account_recipient`; resolves recipient by `email` inside the group, then:
+  - if recipient has other groups in BillionMail, updates contact groups via `/api/contact/update_group`;
+  - if target group is the last one, deletes recipient via `/api/contact/delete`.
 
 ## Add a New Endpoint
 1. Create a route folder under `src/app/api/(feature)/<path>/route.ts` and re-export the handler.
