@@ -1,4 +1,4 @@
 export interface AddRecipientMailerProps {
-  recipients: string[];
-  onUpdate: (recipients: string[]) => void;
+  selectedGroupIds: number[];
+  onUpdate: (groupIds: number[]) => void;
 }

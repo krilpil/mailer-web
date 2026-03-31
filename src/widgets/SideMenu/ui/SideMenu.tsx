@@ -9,7 +9,9 @@ import { SWrapper, SNav, SNavItem, SSignOutButton } from './sideMenu.styles';
 
 const navItems = [
   { href: routes.HOME_PAGE, label: 'Главная' },
-  { href: routes.NEW_MAILING_PAGE, label: 'Новая рассылка' },
+  { href: routes.MAILINGS_PAGE, label: 'Рассылки' },
+  { href: routes.NEW_TEMPLATE_PAGE, label: 'Новый шаблон' },
+  { href: routes.TEMPLATES_PAGE, label: 'Список шаблонов' },
   { href: routes.CONTACTS_PAGE, label: 'Контакты' },
   { href: routes.MAILBOXES_PAGE, label: 'Почтовые ящики' },
   { href: routes.SETTINGS_PAGE, label: 'Настройки' },

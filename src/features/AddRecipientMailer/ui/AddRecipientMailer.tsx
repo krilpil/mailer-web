@@ -1,85 +1,65 @@
 'use client';
 
-import React, { FC, useState } from 'react';
-import { InputProps } from 'antd';
+import React, { FC, useMemo } from 'react';
+import { Button, Select, SelectProps, Typography } from 'antd';
+import { useRouter } from 'next/navigation';
 
-import {
-  SAddRecipientMailer,
-  SAddRecipientRow,
-  SErrorText,
-  SRecipientInput,
-  SRecipientItem,
-  SRecipientList,
-  SRemoveRecipientButton,
-  SSectionTitle,
-  SSubmitRecipientButton,
-} from './addRecipientMailer.styles';
+import { useGetContactGroupsList } from '@/entities/contact/api';
+import { routes } from '@/shared/config/routes';
+
+import { SAddRecipientMailer } from './addRecipientMailer.styles';
 import { AddRecipientMailerProps } from '../model/addRecipientMailer.types';
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NotFoundContent = () => {
+  const router = useRouter();
 
-export const AddRecipientMailer: FC<AddRecipientMailerProps> = ({ recipients, onUpdate }) => {
-  const [recipient, setRecipient] = useState('');
-  const [error, setError] = useState('');
+  return (
+    <>
+      <Typography.Text type="secondary">У вас пока нет созданных групп</Typography.Text>
+      <Button type="primary" onClick={() => router.push(routes.CONTACTS_PAGE)}>
+        Создать группу
+      </Button>
+    </>
+  );
+};
 
-  const handleAddRecipient = () => {
-    const normalizedRecipient = recipient.trim().toLowerCase();
-    if (!normalizedRecipient) return;
+export const AddRecipientMailer: FC<AddRecipientMailerProps> = ({ selectedGroupIds, onUpdate }) => {
+  const contactGroups = useGetContactGroupsList();
 
-    if (!emailPattern.test(normalizedRecipient)) {
-      setError('Введите корректный email');
-      return;
-    }
+  const options = useMemo<SelectProps<number>['options']>(
+    () =>
+      (contactGroups.data || []).map((group) => ({
+        value: group.group_id,
+        label: `${group.name} (${group.recipients_count})`,
+      })),
+    [contactGroups.data]
+  );
 
-    if (recipients.includes(normalizedRecipient)) {
-      setError('Этот email уже добавлен');
-      return;
-    }
+  const isLoading = contactGroups.isFetching;
 
-    onUpdate([...recipients, normalizedRecipient]);
-    setRecipient('');
-    setError('');
-  };
-
-  const handleRemoveRecipient = (email: string) => {
-    onUpdate(recipients.filter((recipientEmail) => recipientEmail !== email));
-  };
-
-  const handleChangeRecipient: InputProps['onChange'] = (event) => {
-    setRecipient(event.target.value);
-    if (error) setError('');
-  };
-
-  const handlePressEnterRecipient: InputProps['onPressEnter'] = () => {
-    handleAddRecipient();
+  const handleChangeGroups = (values: number[]) => {
+    onUpdate(
+      values
+        .map((groupId) => Number(groupId))
+        .filter((groupId) => Number.isInteger(groupId) && groupId > 0)
+    );
   };
 
   return (
     <SAddRecipientMailer>
-      <SSectionTitle>Получатели</SSectionTitle>
-
-      <SAddRecipientRow>
-        <SRecipientInput
-          placeholder="email@domain.com"
-          value={recipient}
-          onChange={handleChangeRecipient}
-          onPressEnter={handlePressEnterRecipient}
-        />
-        <SSubmitRecipientButton onClick={handleAddRecipient}>Добавить</SSubmitRecipientButton>
-      </SAddRecipientRow>
-
-      {error && <SErrorText>{error}</SErrorText>}
-
-      <SRecipientList>
-        {recipients.map((email) => (
-          <SRecipientItem key={email}>
-            <span>{email}</span>
-            <SRemoveRecipientButton type="text" onClick={() => handleRemoveRecipient(email)}>
-              Удалить
-            </SRemoveRecipientButton>
-          </SRecipientItem>
-        ))}
-      </SRecipientList>
+      <Select<number>
+        mode="multiple"
+        placeholder="Выберите одну или несколько групп"
+        value={selectedGroupIds}
+        options={options}
+        onChange={handleChangeGroups}
+        disabled={contactGroups.isFetching}
+        notFoundContent={<NotFoundContent />}
+        style={{ width: '100%' }}
+        variant={'borderless'}
+        loading={isLoading}
+        optionFilterProp="label"
+      />
     </SAddRecipientMailer>
   );
 };

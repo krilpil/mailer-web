@@ -1,9 +1,52 @@
 # Progress
 
 ## Status
-- Базовая документация и Memory Bank заполнены; добавлен эндпоинт обновления DNS записей; сформирован SQL для таблицы доменов аккаунта и уточнён тип `accounts.id`; добавлено сохранение домена и фильтрация списка по `account_domain`; включена проверка JWT для API; подготовлен SQL для `account_mailbox` с уникальным `username` и жёсткой привязкой домена; требуется UNIQUE/PK на `(account_id, domain)` в `account_domain`; добавлена запись mailbox при создании домена; добавлены приватные страницы `/mailboxes` и `/mailing/new`; добавлены серверный/клиентский эндпоинты списка mailbox и таблица на странице; добавлен эндпоинт удаления mailbox с проверкой доступа; добавлен OTP-флоу создания mailbox; `deleteDomain` терпимо обрабатывает отсутствие mailbox; добавлены модульные заметки для доменов и mailbox; базовый перенос `MailerEditor` завершён без store и без кастомных NodeView; добавлены `EditorFloatingMenu`, `EditorPositionMenu`, `EditorBubbleMenu` с логикой из `frontend_employee`, адаптированной под базовые extension’ы; `AddRecipientMailer` получил рабочий UI управления списком email-получателей; устранены предупреждения AntD/Tiptap и ранний доступ к `editor.view`; `title/content` редактора вынесены на уровень `MailingPage`; добавлен базовый `EmailTemplate` на `@react-email/components` с типизированными пропсами и дефолтами; реализован рендер TipTap `JSONContent` в `EmailTemplate` и подключена передача `content` из `MailingPage` в рендер письма; в `EditorBubbleMenu` добавлена авто-нормализация URL (`https://` для ссылок без протокола); добавлены серверные и клиентские endpoint групп контактов (`create/delete/list/import/remove recipient`) с проверкой доступа по `account_recipient`; реализована страница `/contacts` с таблицей групп, просмотром пользователей группы и удалением пользователей из выбранной группы.
+
+- Базовая документация и Memory Bank заполнены; добавлен эндпоинт обновления DNS записей; сформирован SQL для таблицы доменов аккаунта и уточнён тип `accounts.id`; добавлено сохранение домена и фильтрация списка по `account_domain`; включена проверка JWT для API; подготовлен SQL для `account_mailbox` с уникальным `username` и жёсткой привязкой домена; требуется UNIQUE/PK на `(account_id, domain)` в `account_domain`; добавлена запись mailbox при создании домена; добавлены приватные страницы `/mailboxes` и `/mailing/new`; добавлены серверный/клиентский эндпоинты списка mailbox и таблица на странице; добавлен эндпоинт удаления mailbox с проверкой доступа; добавлен OTP-флоу создания mailbox; `deleteDomain` терпимо обрабатывает отсутствие mailbox; добавлены модульные заметки для доменов и mailbox; базовый перенос `MailerEditor` завершён без store и без кастомных NodeView; добавлены `EditorFloatingMenu`, `EditorPositionMenu`, `EditorBubbleMenu` с логикой из `frontend_employee`, адаптированной под базовые extension’ы; старый email-ввод в `AddRecipientMailer` удален и заменен выбором пользовательских групп через `antd Select mode="multiple"`; `selectedGroupIds` подняты в `MailingPage`; устранены предупреждения AntD/Tiptap и ранний доступ к `editor.view`; `title/content` редактора вынесены на уровень `MailingPage`; добавлен базовый `EmailTemplate` на `@react-email/components` с типизированными пропсами и дефолтами; реализован рендер TipTap `JSONContent` в `EmailTemplate` и подключена передача `content` из `MailingPage` в рендер письма; в `EditorBubbleMenu` добавлена авто-нормализация URL (`https://` для ссылок без протокола); добавлены серверные и клиентские endpoint групп контактов (`create/delete/list/import/remove recipient`) с проверкой доступа по `account_recipient`; реализована страница `/contacts` с таблицей групп, просмотром пользователей группы и удалением пользователей из выбранной группы.
+- Добавлены server/client endpoint для batch-рассылок по OpenAPI: `POST /api/batch_mail/task/create` и `GET /api/batch_mail/task/list`, включая нормализацию provider-response и клиентские хуки `useCreateBatchMailTask`/`useGetBatchMailTasksList`.
+- На `/mailing` отправка переключена на `useCreateBatchMailTask`; добавлены поля `addresser` и `template_id`.
+- Для batch-рассылки реализован временный шаблон: `POST /api/batch_mail/task/create` теперь принимает `content` редактора, рендерит HTML, создаёт уникальный `email_template`, создаёт task и удаляет template.
+- Страница `/mailing` переведена в режим `Новый шаблон`: создание шаблона в BillionMail + запись связи шаблона с пользователем в `account_template`.
+- При сохранении шаблона в `account_template` теперь также сохраняется JSONContent редактора в колонку `template` (JSON-строка).
+- Добавлена страница `/templates` (`Список шаблонов`) с таблицей и удалением шаблонов текущего пользователя.
+- На странице `/mailings` добавлена feature `Новая рассылка` (модальное окно выбора отправителя, групп и шаблона) с запуском task в режиме прогрева (`warmup=1`).
+- Добавлена новая приватная страница `/mailings` со списком batch-задач, фильтрами (`keyword`, `status`) и пагинацией.
+- На странице `/mailings` в таблицу задач добавлена колонка `Расчетное время` (`estimated_time_with_warmup`) с человекочитаемым форматированием длительности.
+- Добавлен endpoint `GET /api/batch_mail/task/analytics` (агрегация `task/stat_chart`, `tracking/mail_provider`, `tracking/logs`) и клиентский hook `useGetBatchMailTaskAnalytics`.
+- В таблицу `/mailings` добавлена кнопка `Аналитика` с feature-модалкой полной аналитики по выбранной задаче.
+- В модальном окне аналитики реализованы графики (SVG) для `send_mail_chart`, `bounce_rate_chart`, `open_rate_chart`, `click_rate_chart` и визуальная диаграмма по почтовым провайдерам.
+- Улучшен парсинг `mail_provider` для вложенных структур ответа; удалён блок `Логи отправки` из UI модалки аналитики.
+- `POST /api/batch_mail/task/create` переведён на прямое создание задач по `template_id` без временного template-flow (`create/delete`).
+- Исправлена ошибка UI `Не удалось загрузить список рассылок`: список `/api/batch_mail/task/list` теперь безопасно нормализуется на клиенте, а `status=-1` не отправляется в BillionMail.
 
 ## Completed
+
+- На `/mailings` удалены статусные фильтры и колонка статуса; запрос списка работает без `status` (все статусы).
+- Добавлен серверный endpoint `POST /api/email_template/create` (auth + render HTML + provider create + insert в `account_template`).
+- Добавлены серверные endpoint'ы `GET /api/email_template/list` и `POST /api/email_template/delete` (проверка ownership через `account_template`).
+- Добавлен клиентский хук `useCreateUserTemplate`; `MailingPage` теперь сохраняет шаблон вместо создания task.
+- Добавлены клиентские хуки `useGetUserTemplatesList` и `useDeleteUserTemplate`; таблица `/templates` подключена к ним.
+- Добавлена feature `CreateMailingTask` в `SettingMailings`: создание batch-задач по выбранным группам через `useCreateBatchMailTask` с `warmup=1`.
+- В таблице `/mailings` добавлена колонка `Расчетное время` из `estimated_time_with_warmup`.
+- Реализована feature `Аналитика задачи` на `/mailings` (кнопка в строке + модальное окно с dashboard/провайдерами/логами).
+- Реализована визуализация графиков в аналитике задачи вместо вывода raw JSON.
+- Модалка `Новая рассылка` отправляет `template_id` выбранного шаблона напрямую в `POST /api/batch_mail/task/create`.
+- В `SideMenu` пункт `Новая рассылка` переименован в `Новый шаблон`.
+- В `SideMenu` добавлен пункт `Список шаблонов`.
+- `POST /api/batch_mail/task/create` переведён на payload с `content` вместо `template_id`; серверный handler реализует flow `email_template/create -> batch_mail/task/create -> email_template/delete`.
+- В `MailingPage` удалён ввод `template_id`; отправка использует `title + content` из `MailerEditor`.
+- В `MailingPage` удалено использование `useSendMail`; добавлено создание batch-задач через `useCreateBatchMailTask` (последовательно по выбранным группам).
+- На `/mailing` добавлены controls: выбор mailbox-отправителя (`useGetMailboxesList`) и ввод `template_id`.
+- Создана страница `Рассылки` (`/mailings`): `src/screens/MailingsPage`, `src/widgets/SettingMailings`, table + фильтры + пагинация на базе `useGetBatchMailTasksList`.
+- В `routes` добавлен `MAILINGS_PAGE`, в `SideMenu` добавлен пункт `Рассылки`.
+- Для `useGetBatchMailTasksList` убран hard-fail на полной Yup-валидации задач; добавлена безопасная нормализация ответа с дефолтами.
+- В `src/app/api/(mailing)/_services/listBatchMailTasks.ts` включено условное добавление query-параметра `status` (только `>= 0`).
+- Реализованы route handlers и сервисы в `src/app/api/(mailing)` для `POST /api/batch_mail/task/create` и `GET /api/batch_mail/task/list` с Yup-валидацией payload/query.
+- Добавлены серверные DTO для batch-task create/list в `src/app/api/(mailing)/batch_mail/task/*` и нормализация `task/tag/group` полей в ответе `list`.
+- Добавлены клиентские модули `src/entities/mailer/api/createBatchMailTask` и `src/entities/mailer/api/getBatchMailTasksList` с валидацией ответов и экспортом через `src/entities/mailer/api/index.ts`.
+- Обновлены `docs/API.md`, `README.md` и `.memory_bank/modules/mailing.md` с описанием новых batch-mail endpoint и контрактов.
+- `AddRecipientMailer` полностью переключен на выбор групп контактов пользователя через `antd Select mode="multiple"` без старого ручного ввода email.
+- В `MailingPage` добавлено состояние `selectedGroupIds` и отображение выбранных `group_id` рядом с блоком выбора получателей.
 - В `SettingContacts` реализован импорт пользователей из файла рядом с ручным добавлением (та же архитектура, что в `CreateContactGroup`).
 - Создан общий модуль `entities/contact/lib/recipientsImport.ts` и общий UI-блок `entities/contact/ui/RecipientsImportFileInput` для исключения дублирования логики file-import.
 - В `CreateContactGroup` реализован предпросмотр импорта: при выборе файла распознанные email автоматически добавляются в поле ручного списка пользователей.
@@ -57,16 +100,45 @@
 - В `proxy` добавлена проверка JWT для `/api/*`, кроме `/api/auth` и `/api/sign-up`.
 
 ## In Progress
+
 - Подготовка коммита и фиксация `last_checked_commit`.
 
 ## Next
+
+- Реализовать endpoint списка пользовательских шаблонов (фильтрация по `account_template`), чтобы подключить выбор шаблона в сценарий создания batch-задачи.
+- Добавить действия управления задачами на странице `/mailings` (pause/resume/delete) при необходимости продукта.
 - Исправить `yarn lint` (опция `--fix` не поддерживается).
 - Уточнить CI/CD и инфраструктуру, если они находятся вне репозитория.
 
 ## Known Issues
+
 - `yarn lint` падает: `next lint` не принимает `--fix` в текущей версии.
 
 ## Changelog
+
+- На странице `/mailings` убраны UI-статусы: удалён фильтр `status` и колонка `Статус`; поиск работает сразу по всем статусам задач.
+- На странице `/mailings` в таблицу добавлена колонка `Расчетное время` (`estimated_time_with_warmup`) с форматированием `д/ч/м/с`.
+- Добавлен маршрут `GET /api/batch_mail/task/analytics` и UI-feature аналитики задачи по кнопке `Аналитика` в таблице `/mailings`.
+- Страница `/mailing` переименована в `Новый шаблон`; удалены элементы отправки рассылки, добавлено сохранение шаблона через `POST /api/email_template/create`.
+- Добавлена страница `Список шаблонов` с удалением; выводятся только шаблоны пользователя из `account_template`.
+- На странице `Рассылки` добавлена кнопка `Новая рассылка` с модальным окном и запуском задач рассылки в режиме прогрева.
+- В `POST /api/email_template/create` добавлена запись ownership в `account_template` с `account_id` текущего пользователя.
+- В `POST /api/batch_mail/task/create` изменён контракт: вместо `template_id` клиент передаёт `content` из `MailerEditor`; сервер создаёт временный template, создаёт задачу рассылки и удаляет template.
+- На `/mailing` удалён input `template_id`; пользователь формирует письмо только в редакторе, контент идёт в batch-flow.
+- Исправлен кейс, когда `/api/batch_mail/task/list` возвращал данные, но UI показывал `Не удалось загрузить список рассылок`: клиентский слой больше не падает на частично несовпадающем контракте.
+- Для режима «Все статусы» перестали отправлять `status=-1` в BillionMail при вызове `/batch_mail/task/list`.
+- `MailingPage` переключен на `useCreateBatchMailTask`: вместо `sendMail` создаются batch-задачи с payload OpenAPI (`addresser`, `subject`, `template_id`, `group_id`, `start_time` и флаги).
+- На `/mailing` добавлены UI-поля выбора отправителя и `template_id`, источник отправителей — `GET /api/mailbox/all`.
+- Добавлена приватная страница `/mailings` (`MailingsPage` + `SettingMailings`) со списком задач из `GET /api/batch_mail/task/list`.
+- В таблице `/mailings` реализованы поиск по теме, фильтр `status`, пагинация и вывод ключевых метрик задач.
+- В навигацию (`SideMenu`) добавлен пункт `Рассылки`; в `routes` добавлен `MAILINGS_PAGE`.
+- Добавлены серверные endpoint `POST /api/batch_mail/task/create` и `GET /api/batch_mail/task/list` в route-group `(mailing)`.
+- Для `POST /api/batch_mail/task/create` добавлена валидация payload по обязательным полям OpenAPI (`addresser`, `subject`, `template_id`, `group_id`, `start_time`) и проксирование в BillionMail.
+- Для `GET /api/batch_mail/task/list` добавлена валидация query (`page`, `page_size`, `keyword?`, `status?`) и серверная нормализация данных задач, тегов и групп.
+- В `entities/mailer/api` добавлены клиентские хуки `useCreateBatchMailTask` и `useGetBatchMailTasksList` и соответствующие response-validators.
+- Обновлены `docs/API.md`, `README.md` и `.memory_bank/modules/mailing.md` под новые маршруты `/api/batch_mail/task/*`.
+- `AddRecipientMailer` переведен с ручного ввода email на выбор групп пользователя (`Select mode="multiple"`), с загрузкой из `GET /api/contact/group/list` и fallback-кнопкой `Создать группу` при пустом списке.
+- В `MailingPage` заменено состояние `recipients` на `selectedGroupIds`; выбранные `group_id` выводятся в UI для контроля результата выбора.
 - В `SettingContacts` добавлен импорт из файла (`csv/txt/xls/xlsx`, до 20 Мб) рядом с ручным добавлением пользователей.
 - Логика импорта из файла (парсинг, предпросмотр, валидация, payload) вынесена в общий модуль `entities/contact/lib/recipientsImport.ts` и переиспользуется в `CreateContactGroup` и `SettingContacts`.
 - В `CreateContactGroup` после загрузки файла распознанные email отображаются в списке пользователей (поле ручного ввода).
@@ -111,5 +183,6 @@
 - Добавлены модульные заметки для доменов и mailbox в `.memory_bank/modules/`.
 
 ## Контроль изменений
-- last_checked_commit: 9c548e86bd8798c3b355046176ddefbabef17182
-- last_checked_date: 2026-03-30
+
+- last_checked_commit: f6b800b
+- last_checked_date: 2026-03-31

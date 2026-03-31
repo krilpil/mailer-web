@@ -2,69 +2,83 @@
 
 import React, { useState } from 'react';
 import { JSONContent } from '@tiptap/react';
-import { render } from '@react-email/render';
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 
 import { MailerEditor } from '@/widgets/MailerEditor';
-import { useSendMail } from '@/entities/mailer/api';
-import { AddRecipientMailer, AddRecipientMailerProps } from '@/features/AddRecipientMailer';
-import { EmailTemplate } from '@/entities/mailer';
+import { useCreateUserTemplate } from '@/entities/mailer/api';
 
 import { SMailingPage, SMetaContent } from './mailingPage.styles';
 
 const defaultContent: JSONContent = { type: 'doc', content: [{ type: 'paragraph' }] };
 
-export const MailingPage = () => {
-  const sendMail = useSendMail();
+type SendResult = {
+  type: 'success' | 'error';
+  message: string;
+};
 
-  const [recipients, setRecipients] = useState<string[]>([]);
+export const MailingPage = () => {
+  const createUserTemplate = useCreateUserTemplate();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState<JSONContent>(defaultContent);
+  const [saveResult, setSaveResult] = useState<SendResult | null>(null);
 
-  const disableSendButton = !recipients.length || !title;
+  const normalizedTitle = title.trim();
+  const disableSaveButton = !normalizedTitle;
 
-  const handleSendMail = async () => {
-    const renderedEmailTemplate = await render(<EmailTemplate title={title} content={content} />);
+  const handleCreateTemplate = async () => {
+    setSaveResult(null);
 
-    sendMail.mutateAsync({
-      recipient: recipients[0],
-      attribs: {
-        html: renderedEmailTemplate,
-      },
-    });
+    try {
+      const response = await createUserTemplate.mutateAsync({
+        template_name: normalizedTitle,
+        content,
+      });
+
+      const savedTemplateId = response.data?.template_id;
+      const successMessage = savedTemplateId
+        ? `Шаблон сохранен (ID: ${savedTemplateId})`
+        : 'Шаблон сохранен';
+
+      setSaveResult({
+        type: 'success',
+        message: successMessage,
+      });
+    } catch {
+      setSaveResult({
+        type: 'error',
+        message: 'Не удалось сохранить шаблон',
+      });
+    }
   };
-
-  const handleUpdateRecipient: AddRecipientMailerProps['onUpdate'] = (updatedRecipients) =>
-    setRecipients(updatedRecipients);
 
   return (
     <SMailingPage>
-      <div>
-        <MailerEditor
-          title={title}
-          content={content}
-          onUpdateTitle={setTitle}
-          onUpdateContent={setContent}
-        />
+      <Typography.Title level={3}>Новый шаблон</Typography.Title>
 
-        <p>{JSON.stringify(content)}</p>
-      </div>
+      <MailerEditor
+        title={title}
+        content={content}
+        onUpdateTitle={setTitle}
+        onUpdateContent={setContent}
+      />
 
       <SMetaContent>
         <Button
-          onClick={handleSendMail}
-          loading={sendMail.isPending}
-          disabled={disableSendButton}
+          onClick={handleCreateTemplate}
+          loading={createUserTemplate.isPending}
+          disabled={disableSaveButton}
           type={'primary'}
-          block
         >
-          Отправить рассылку
+          Сохранить шаблон
         </Button>
-        <AddRecipientMailer recipients={recipients} onUpdate={handleUpdateRecipient} />
-        <p>{sendMail.data?.msg}</p>
-      </SMetaContent>
 
-      {/*{sendMail.data && <p>{sendMail.data.msg}</p>}*/}
+        {saveResult ? (
+          <Typography.Text type={saveResult.type === 'error' ? 'danger' : 'success'}>
+            {saveResult.message}
+          </Typography.Text>
+        ) : null}
+      </SMetaContent>
     </SMailingPage>
   );
 };

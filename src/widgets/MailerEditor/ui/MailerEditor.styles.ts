@@ -8,7 +8,7 @@ export const SMailerEditor = styled.div`
   flex-direction: column;
   gap: 32px;
   padding: 0 36px;
-  max-width: 728px;
+  width: 728px;
 `;
 
 export const SHeading = styled(Input.TextArea).attrs({
