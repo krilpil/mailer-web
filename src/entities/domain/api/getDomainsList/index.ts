@@ -19,12 +19,7 @@ export const getDomainsList = async (
       page: params.page,
     },
   })
-    .then(async ({ data }) => {
-      const test = await getDomainsListResponseValidate.validate(data, { abortEarly: false });
-      test.data.list[0].dns_records.a.valid = false;
-
-      return test;
-    })
+    .then(({ data }) => getDomainsListResponseValidate.validate(data, { abortEarly: false }))
     .catch((error: AxiosError | ValidationError) => {
       const errorName = 'domains/getDomainsList';
 

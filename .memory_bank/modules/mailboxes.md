@@ -31,3 +31,6 @@
 ## Notes
 - OTP хранится в таблице `otp`, проверка/consumption через `verifyMailboxOtp`.
 - Отправка OTP использует шаблон `CreateDomainOtpEmail`.
+
+## Build Notes (2026-04-01)
+- Клиентский response-validator `deleteMailbox` приведён к контракту `IDeleteMailboxResponse`: добавлено optional-поле `error`.

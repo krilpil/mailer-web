@@ -26,7 +26,7 @@ const NotFoundContent = () => {
 export const AddRecipientMailer: FC<AddRecipientMailerProps> = ({ selectedGroupIds, onUpdate }) => {
   const contactGroups = useGetContactGroupsList();
 
-  const options = useMemo<SelectProps<number>['options']>(
+  const options = useMemo<SelectProps<number[]>['options']>(
     () =>
       (contactGroups.data || []).map((group) => ({
         value: group.group_id,
@@ -47,7 +47,7 @@ export const AddRecipientMailer: FC<AddRecipientMailerProps> = ({ selectedGroupI
 
   return (
     <SAddRecipientMailer>
-      <Select<number>
+      <Select<number[]>
         mode="multiple"
         placeholder="Выберите одну или несколько групп"
         value={selectedGroupIds}

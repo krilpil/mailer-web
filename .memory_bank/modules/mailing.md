@@ -75,3 +75,8 @@
 - Таблица `account_template` хранит принадлежность шаблона аккаунту.
 - Доступ к созданию шаблона разрешён только авторизованному пользователю.
 - Сохранённый `template_id` можно использовать в будущем для выдачи списка шаблонов только текущего пользователя.
+
+## Build Notes (2026-04-01)
+
+- `POST /api/mailing/sendMail`: в error-response поле `msg` теперь всегда `string` (fallback `Failed to send email`) для строгой TS-типизации.
+- В feature выбора групп (`AddRecipientMailer`, `CreateMailingTask`) `antd Select` в режиме `multiple` типизирован как `Select<number[]>`.

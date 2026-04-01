@@ -5,11 +5,9 @@ import { ISendOTPSignUpResponse } from './sendOTPSignUp.types';
 export const sendOTPSignUpResponseValidate: ObjectSchema<ISendOTPSignUpResponse> = object({
   success: boolean().required(),
   msg: string().required(),
-  error: string().notRequired(),
+  error: string().optional(),
   data: object({
     otp_guid: string().required(),
     expires_at: number().required(),
-  })
-    .notRequired()
-    .nullable(),
+  }).optional(),
 }).required();

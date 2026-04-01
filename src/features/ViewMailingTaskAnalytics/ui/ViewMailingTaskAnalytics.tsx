@@ -629,6 +629,7 @@ export const ViewMailingTaskAnalytics = ({
   );
 
   const analytics = useGetBatchMailTaskAnalytics(analyticsPayload);
+  const isInitialLoading = analytics.isLoading || (!analytics.data && analytics.isFetching);
 
   const dashboardEntries = useMemo(() => {
     const dashboard = analytics.data?.stat_chart?.dashboard || {};
@@ -713,7 +714,7 @@ export const ViewMailingTaskAnalytics = ({
         <Typography.Text type="danger">Не удалось загрузить аналитику задачи</Typography.Text>
       ) : null}
 
-      <Card title="Сводная аналитика">
+      <Card title="Сводная аналитика" loading={isInitialLoading}>
         {dashboardEntries.length ? (
           <Descriptions column={2} size="small">
             {dashboardEntries.map(([key, value]) => (
@@ -729,7 +730,7 @@ export const ViewMailingTaskAnalytics = ({
         )}
       </Card>
 
-      <Card title="Графики задачи">
+      <Card title="Графики задачи" loading={isInitialLoading}>
         <Space direction="vertical" size={24} style={{ width: '100%' }}>
           <div>
             <Typography.Text strong>Динамика отправок</Typography.Text>

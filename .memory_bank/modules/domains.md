@@ -25,3 +25,8 @@
 - Таблица `account_domain` хранит доступные домены аккаунта.
 - `accounts.id` — `uuid`.
 - `account_mailbox` используется для хранения созданного mailbox при создании домена.
+
+## Build Notes (2026-04-01)
+- Клиентский валидатор `getDomainsList` синхронизирован с контрактом `/api/domains/list`: в `list[]` обязательны `dns_records`.
+- Удалена отладочная мутация validated-ответа в `entities/domain/api/getDomainsList/index.ts`.
+- В `freshDNSRecords` уточнён тип `AxiosError<{ msg?: string; error?: string }>` для безопасного доступа к `response.data`.

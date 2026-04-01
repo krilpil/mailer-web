@@ -6,7 +6,10 @@ import { sendMailPayloadValidate } from '../mailing/sendMail/sendMail.validation
 import { ISendMailPayload, ISendMailResponse } from '../mailing/sendMail/sendMail.types';
 
 const buildErrorResponse = (msg?: string) =>
-  NextResponse.json<ISendMailResponse>({ msg, success: false }, { status: 500 });
+  NextResponse.json<ISendMailResponse>(
+    { msg: msg ?? 'Failed to send email', success: false },
+    { status: 500 }
+  );
 
 export async function POST(request: Request) {
   const payload: ISendMailPayload = await request.json();

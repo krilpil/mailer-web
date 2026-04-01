@@ -154,7 +154,7 @@ export const CreateMailingTask = ({ onCreated }: CreateMailingTaskProps) => {
             label="Группы получателей"
             rules={[{ required: true, message: 'Выберите одну или несколько групп' }]}
           >
-            <Select<number>
+            <Select<number[]>
               mode="multiple"
               placeholder="Выберите группы"
               options={groupOptions}

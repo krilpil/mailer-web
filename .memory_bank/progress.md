@@ -2,6 +2,13 @@
 
 ## Status
 
+- Закрыт свежий блокер `yarn build:prod`: в `SettingAnalytics` устранен конфликт типов `Dayjs` при работе `RangePicker` (state диапазона переведен на Unix-метки).
+- Повторная сборка подтверждена: `yarn build:prod` успешно проходит (`compile + TypeScript + prerender`).
+- Закрыт блокер сборки: `npm run build:prod` проходит успешно (Next.js compile + TypeScript + prerender).
+- Исправлены несовместимости типов после обновлений (`yup@1.7`, `antd Select`, строгий TS): `sendMail` error-response, `parseAndValidate`, response-validators auth/domain/mailbox, типизация multi-select для групп получателей.
+- Проверка истории изменений: `git log 507610a..HEAD` пустой, новых коммитов относительно `last_checked_commit` нет.
+- Реализован новый приватный раздел `/analytics` с account-scoped аналитикой по доменам и mailbox отправителей: серверные endpoint'ы `GET /api/analytics/domains` и `GET /api/analytics/mailboxes`, клиентские хуки `useGetDomainsAnalytics`/`useGetMailboxesAnalytics`, UI с KPI, top-таблицами и timeline.
+- Для UI аналитики добавлены loader-состояния в компонентах, ожидающих данные (`SettingAnalytics`, `ViewMailingTaskAnalytics`): первичная загрузка отображается через `Card/Table loading`.
 - Базовая документация и Memory Bank заполнены; добавлен эндпоинт обновления DNS записей; сформирован SQL для таблицы доменов аккаунта и уточнён тип `accounts.id`; добавлено сохранение домена и фильтрация списка по `account_domain`; включена проверка JWT для API; подготовлен SQL для `account_mailbox` с уникальным `username` и жёсткой привязкой домена; требуется UNIQUE/PK на `(account_id, domain)` в `account_domain`; добавлена запись mailbox при создании домена; добавлены приватные страницы `/mailboxes` и `/mailing/new`; добавлены серверный/клиентский эндпоинты списка mailbox и таблица на странице; добавлен эндпоинт удаления mailbox с проверкой доступа; добавлен OTP-флоу создания mailbox; `deleteDomain` терпимо обрабатывает отсутствие mailbox; добавлены модульные заметки для доменов и mailbox; базовый перенос `MailerEditor` завершён без store и без кастомных NodeView; добавлены `EditorFloatingMenu`, `EditorPositionMenu`, `EditorBubbleMenu` с логикой из `frontend_employee`, адаптированной под базовые extension’ы; старый email-ввод в `AddRecipientMailer` удален и заменен выбором пользовательских групп через `antd Select mode="multiple"`; `selectedGroupIds` подняты в `MailingPage`; устранены предупреждения AntD/Tiptap и ранний доступ к `editor.view`; `title/content` редактора вынесены на уровень `MailingPage`; добавлен базовый `EmailTemplate` на `@react-email/components` с типизированными пропсами и дефолтами; реализован рендер TipTap `JSONContent` в `EmailTemplate` и подключена передача `content` из `MailingPage` в рендер письма; в `EditorBubbleMenu` добавлена авто-нормализация URL (`https://` для ссылок без протокола); добавлены серверные и клиентские endpoint групп контактов (`create/delete/list/import/remove recipient`) с проверкой доступа по `account_recipient`; реализована страница `/contacts` с таблицей групп, просмотром пользователей группы и удалением пользователей из выбранной группы.
 - Добавлены server/client endpoint для batch-рассылок по OpenAPI: `POST /api/batch_mail/task/create` и `GET /api/batch_mail/task/list`, включая нормализацию provider-response и клиентские хуки `useCreateBatchMailTask`/`useGetBatchMailTasksList`.
 - На `/mailing` отправка переключена на `useCreateBatchMailTask`; добавлены поля `addresser` и `template_id`.
@@ -21,6 +28,12 @@
 
 ## Completed
 
+- Добавлены endpoint'ы `GET /api/analytics/domains` и `GET /api/analytics/mailboxes` (route-group `(analytics)`), с валидацией query и проверкой account ownership.
+- Реализован серверный агрегатор account analytics (`buildAccountAnalyticsSource`) с объединением данных BillionMail и локальных таблиц (`account_domain`, `account_mailbox`).
+- Добавлена клиентская сущность `entities/analytics` с хуками `useGetDomainsAnalytics` и `useGetMailboxesAnalytics`.
+- Добавлена приватная страница `/analytics` и виджет `SettingAnalytics` (период, tabs, KPI, top, таблицы, timeline).
+- В `SettingAnalytics` и `ViewMailingTaskAnalytics` добавлены явные loader-состояния на первичной загрузке данных.
+- Обновлены `routes` и `SideMenu`: добавлен пункт `Аналитика`.
 - На `/mailings` удалены статусные фильтры и колонка статуса; запрос списка работает без `status` (все статусы).
 - Добавлен серверный endpoint `POST /api/email_template/create` (auth + render HTML + provider create + insert в `account_template`).
 - Добавлены серверные endpoint'ы `GET /api/email_template/list` и `POST /api/email_template/delete` (проверка ownership через `account_template`).
@@ -116,6 +129,14 @@
 
 ## Changelog
 
+- Исправлен TypeScript-конфликт в `src/widgets/SettingAnalytics/ui/SettingAnalytics.tsx`: состояние диапазона дат изменено с `[Dayjs, Dayjs]` на `[number, number]` (Unix), добавлено вычисляемое `rangePickerValue` для `RangePicker`, обновлены `periodPayload` и рендер периода.
+- После правки `SettingAnalytics` подтверждена успешная прод-сборка командой `yarn build:prod`.
+- Исправлены ошибки прод-сборки: синхронизированы типы `yup`-валидаторов и DTO (`sendMail`, `parseAndValidate`, `sendOTPSignUp`, `getDomainsList`, `deleteMailbox`, `freshDNSRecords`), а также `Select<number[]>` для multi-select сценариев групп; `build:prod` успешно завершён.
+- Добавлена страница `/analytics` с аналитикой по доменам и отправителям (mailbox), доступная только в private-zone.
+- Добавлены API-маршруты `GET /api/analytics/domains` и `GET /api/analytics/mailboxes` с привязкой к текущему `account_id`.
+- Добавлены loader-состояния в аналитические UI-компоненты, ожидающие сетевые данные (`Card/Table loading` вместо пустых состояний на первом рендере).
+- Серверная аналитика агрегирует: задачи рассылок, failed-логи, overview по доменам, DNS/SSL/blacklist/quota и mailbox-метрики.
+- В `entities/analytics` добавлены клиентские запросы и типы для новых analytics endpoint'ов.
 - На странице `/mailings` убраны UI-статусы: удалён фильтр `status` и колонка `Статус`; поиск работает сразу по всем статусам задач.
 - На странице `/mailings` в таблицу добавлена колонка `Расчетное время` (`estimated_time_with_warmup`) с форматированием `д/ч/м/с`.
 - Добавлен маршрут `GET /api/batch_mail/task/analytics` и UI-feature аналитики задачи по кнопке `Аналитика` в таблице `/mailings`.
@@ -184,5 +205,5 @@
 
 ## Контроль изменений
 
-- last_checked_commit: f6b800b
-- last_checked_date: 2026-03-31
+- last_checked_commit: 507610a
+- last_checked_date: 2026-04-02

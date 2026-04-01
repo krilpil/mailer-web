@@ -20,7 +20,7 @@ const freshDNSRecords = async ({
     },
   })
     .then(({ data }) => freshDNSRecordsResponseValidate.validate(data, { abortEarly: false }))
-    .catch((error: AxiosError | ValidationError) => {
+    .catch((error: AxiosError<{ msg?: string; error?: string }> | ValidationError) => {
       const errorName = 'domains/freshDNSRecords';
 
       if (error instanceof AxiosError) {

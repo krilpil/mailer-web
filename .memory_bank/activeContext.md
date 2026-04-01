@@ -2,6 +2,10 @@
 
 ## Current Focus
 
+- Стабильность прод-сборки `/analytics`: устранение строгих TS-конфликтов `Dayjs` в `RangePicker` (`SettingAnalytics`).
+- Страница `/analytics`: account-scoped аналитика по доменам и mailbox отправителей (summary, top, таблицы, timeline).
+- Endpoint'ы `GET /api/analytics/domains` и `GET /api/analytics/mailboxes` с фильтрацией только по данным текущего `account_id`.
+- Клиентские хуки `useGetDomainsAnalytics` и `useGetMailboxesAnalytics`.
 - Страница `/mailing`: создание пользовательских шаблонов через `MailerEditor` и `useCreateUserTemplate`.
 - Страница `/templates`: список и удаление пользовательских шаблонов через таблицу.
 - Страница `/mailings`: запуск новой рассылки из модального окна (выбор отправителя, групп и шаблона).
@@ -21,6 +25,29 @@
 
 ## Recent Changes
 
+- Исправлен блокирующий TypeScript-конфликт в `SettingAnalytics`: диапазон дат переведен с `Dayjs`-state на Unix-state (`[start_time, end_time]`), чтобы убрать несовместимость типов `Dayjs` между `RangePicker` и локальными плагинами `dayjs`.
+- Для `RangePicker` добавлено вычисляемое значение `rangePickerValue` из Unix-state; отображение периода и `periodPayload` теперь строятся детерминированно через Unix-метки.
+- Повторная проверка подтвердила, что `yarn build:prod` проходит успешно после фикса (`compile + TypeScript + static generation`).
+- Исправлены блокирующие TypeScript-ошибки прод-сборки: `npm run build:prod` теперь проходит до конца без ошибок.
+- В `POST /api/mailing/sendMail` устранён конфликт `string | undefined` -> `string`: `buildErrorResponse` теперь всегда возвращает `msg` с fallback.
+- В `src/app/api/_utils/request.ts` generic `parseAndValidate` ограничен `AnyObject`, результат `schema.validate` приведён к `T` для совместимости с типами `yup@1.7`.
+- В клиентских схемах/типах устранены несовпадения контрактов:
+  - `sendOTPSignUp.validation`: `notRequired/nullable` заменены на `optional`.
+  - `freshDNSRecords`: уточнён тип `AxiosError<{ msg?: string; error?: string }>` для доступа к `response.data`.
+  - `getDomainsList.validation`: добавлена валидация `dns_records` по фактическому контракту, удалена отладочная мутация validated payload.
+  - `deleteMailbox.validation`: добавлено optional-поле `error`.
+- В UI исправлена типизация множественного выбора групп: `Select<number[]>` в `AddRecipientMailer` и `CreateMailingTask`.
+
+- Добавлена новая приватная страница `/analytics` и пункт меню `Аналитика`.
+- Добавлен route-group `src/app/api/(analytics)` с endpoint'ами:
+  - `GET /api/analytics/domains`
+  - `GET /api/analytics/mailboxes`
+- В серверной аналитике реализован account-scoped доступ: данные ограничиваются текущим `account_id` через `account_domain` и `account_mailbox`; запросы к чужому `account_id` отклоняются (`403`).
+- Добавлен общий сервис агрегации аналитики аккаунта: задачи рассылок, overview/failed, доменные DNS/SSL/blacklist/quota и mailbox-метрики.
+- Добавлена клиентская сущность `entities/analytics` с хуками `useGetDomainsAnalytics` и `useGetMailboxesAnalytics`.
+- Добавлен UI-виджет `SettingAnalytics`: выбор периода, вкладки по доменам/отправителям, KPI-card'ы, топы, таблицы и timeline.
+- Для аналитических UI-компонентов добавлены loader-состояния: первичная загрузка данных отображается через `Card loading` и `Table loading` (без ложных пустых состояний на первом рендере).
+- В модалке аналитики задачи (`ViewMailingTaskAnalytics`) добавлен `Card loading` для первичной загрузки dashboard и графиков.
 - На странице `/mailings` в таблицу задач добавлена колонка `Расчетное время` из `estimated_time_with_warmup` с форматированием длительности.
 - На странице `/mailings` добавлена кнопка `Аналитика` в строке задачи и feature-модалка с полной аналитикой текущей task.
 - Добавлен endpoint `GET /api/batch_mail/task/analytics`: агрегирует BillionMail `task/stat_chart`, `tracking/mail_provider`, `tracking/logs`.
@@ -110,6 +137,8 @@
 
 ## Next Steps
 
+- Добавить фильтры по списку доменов/mailbox прямо в UI `/analytics` (client-side selector + передача в query `domains/mailboxes`).
+- Добавить экспорты CSV для таблиц `/analytics` (домены и mailbox-аналитика).
 - Реализовать список пользовательских шаблонов из `account_template` + BillionMail для последующего выбора при создании batch-задачи.
 - Добавить действия управления задачами на `/mailings` (pause/resume/delete) при необходимости продукта.
 - Согласовать и реализовать стратегию отправки при выборе нескольких групп (`selectedGroupIds`) с атомарностью/rollback (сейчас задачи создаются последовательно по группам).

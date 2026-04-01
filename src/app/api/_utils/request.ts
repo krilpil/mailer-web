@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { ObjectSchema, ValidationError } from 'yup';
+import { AnyObject, ObjectSchema, ValidationError } from 'yup';
 
 type ParseResult<T> = { data: T } | { error: NextResponse };
 
-export const parseAndValidate = async <T>(
+export const parseAndValidate = async <T extends AnyObject>(
   request: Request,
   schema: ObjectSchema<T>
 ): Promise<ParseResult<T>> => {
@@ -19,7 +19,7 @@ export const parseAndValidate = async <T>(
 
   try {
     const data = await schema.validate(payload, { abortEarly: false, stripUnknown: true });
-    return { data };
+    return { data: data as T };
   } catch (error) {
     if (error instanceof ValidationError) {
       const msg = error.errors.length ? error.errors.join(', ') : 'Validation error';
