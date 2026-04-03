@@ -52,11 +52,11 @@ export async function POST(request: Request) {
   const session = await auth();
   const accountId = session?.user?.id;
   if (!accountId) {
-    return buildErrorResponse('Unauthorized', 401, 'email_template_access_denied');
+    return buildErrorResponse('Требуется авторизация', 401, 'email_template_access_denied');
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
-    return buildErrorResponse('Mail API is not configured');
+    return buildErrorResponse('Почтовый API не настроен');
   }
 
   const templateId = parsedResult.data.template_id;
@@ -69,11 +69,11 @@ export async function POST(request: Request) {
     );
 
     if ((ownershipRows as Array<unknown>).length === 0) {
-      return buildErrorResponse('Template is not available', 403, 'email_template_access_denied');
+      return buildErrorResponse('Шаблон недоступен', 403, 'email_template_access_denied');
     }
   } catch {
     return buildErrorResponse(
-      'Failed to check template access',
+      'Не удалось проверить доступ к шаблону',
       500,
       'email_template_delete_failed'
     );
@@ -94,9 +94,9 @@ export async function POST(request: Request) {
         shouldDeleteLocal = true;
       } else {
         return buildErrorResponse(
-          providerMessage ?? 'Failed to delete template',
+          'Не удалось удалить шаблон',
           500,
-          providerBody?.error ?? 'email_template_delete_failed',
+          'email_template_delete_failed',
           providerBody?.code
         );
       }
@@ -110,14 +110,14 @@ export async function POST(request: Request) {
         shouldDeleteLocal = true;
       } else {
         return buildErrorResponse(
-          providerMessage ?? 'Failed to delete template',
+          'Не удалось удалить шаблон',
           500,
-          providerError?.error ?? 'email_template_delete_failed',
+          'email_template_delete_failed',
           providerError?.code
         );
       }
     } else {
-      return buildErrorResponse('Failed to delete template');
+      return buildErrorResponse('Не удалось удалить шаблон');
     }
   }
 
@@ -130,12 +130,12 @@ export async function POST(request: Request) {
       );
     } catch {
       return buildErrorResponse(
-        'Failed to delete local template',
+        'Не удалось удалить шаблон в локальной базе',
         500,
         'email_template_delete_failed'
       );
     }
   }
 
-  return NextResponse.json<IDeleteUserTemplateResponse>({ success: true, msg: 'OK' });
+  return NextResponse.json<IDeleteUserTemplateResponse>({ success: true, msg: 'Успешно' });
 }

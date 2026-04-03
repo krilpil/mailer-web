@@ -115,7 +115,7 @@ const normalizeResponse = (raw: unknown): IGetBatchMailTasksListResponse => {
 
   return {
     success: source.success === true,
-    msg: toString(source.msg) || 'OK',
+    msg: toString(source.msg) || 'Успешно',
     code: typeof source.code === 'number' && Number.isFinite(source.code) ? source.code : undefined,
     error: typeof source.error === 'string' ? source.error : undefined,
     data: {

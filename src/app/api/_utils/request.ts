@@ -13,7 +13,10 @@ export const parseAndValidate = async <T extends AnyObject>(
     payload = await request.json();
   } catch {
     return {
-      error: NextResponse.json({ success: false, msg: 'Invalid JSON payload' }, { status: 400 }),
+      error: NextResponse.json(
+        { success: false, msg: 'Некорректное тело запроса' },
+        { status: 400 }
+      ),
     };
   }
 
@@ -22,11 +25,13 @@ export const parseAndValidate = async <T extends AnyObject>(
     return { data: data as T };
   } catch (error) {
     if (error instanceof ValidationError) {
-      const msg = error.errors.length ? error.errors.join(', ') : 'Validation error';
-
-      return { error: NextResponse.json({ success: false, msg }, { status: 400 }) };
+      return {
+        error: NextResponse.json({ success: false, msg: 'Некорректные данные запроса' }, { status: 400 }),
+      };
     }
 
-    return { error: NextResponse.json({ success: false, msg: 'Validation error' }, { status: 400 }) };
+    return {
+      error: NextResponse.json({ success: false, msg: 'Некорректные данные запроса' }, { status: 400 }),
+    };
   }
 };

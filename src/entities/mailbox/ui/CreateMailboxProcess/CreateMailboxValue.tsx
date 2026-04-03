@@ -40,7 +40,7 @@ export const CreateMailboxValue: FC<CreateMailboxValueProps> = ({ domains, onSub
 
   return (
     <Form layout="vertical" onFinish={formik.handleSubmit}>
-      <p>Выберите домен и укажите local_part для почтового ящика.</p>
+      <p>Выберите домен и укажите часть адреса до символа @.</p>
 
       <Form.Item validateStatus={localPartValidateStatus} help={localPartError}>
         <Space.Compact>
@@ -49,7 +49,7 @@ export const CreateMailboxValue: FC<CreateMailboxValueProps> = ({ domains, onSub
             value={formik.values.localPart}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            placeholder="example"
+            placeholder="moi_yashik"
           />
           <Select
             placeholder="Домен"

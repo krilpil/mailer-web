@@ -1,4 +1,4 @@
-# Mailfinch Core — Архитектурный обзор
+# Mailfinch — Архитектурный обзор
 
 ## Обзор подсистем
 
@@ -23,6 +23,7 @@
   - В `(mailing)` доступны endpoint'ы рассылки и шаблонов: `POST /api/mailing/sendMail`, `POST /api/batch_mail/task/create`, `GET /api/batch_mail/task/list`, `GET /api/batch_mail/task/analytics`, `POST /api/email_template/create`, `GET /api/email_template/list`, `POST /api/email_template/delete`.
   - В `(analytics)` доступны endpoint'ы сводной аналитики аккаунта: `GET /api/analytics/domains`, `GET /api/analytics/mailboxes`.
   - `POST /api/batch_mail/task/create` создаёт задачу напрямую по `template_id` уже существующего шаблона BillionMail.
+  - `GET /api/batch_mail/task/list` возвращает только задачи, доступные текущему пользователю (по ownership в `account_template`, `account_recipient`, `account_mailbox`, `account_domain`).
   - `GET /api/batch_mail/task/analytics` агрегирует аналитику задачи из BillionMail: графики (`/batch_mail/task/stat_chart`), статистику провайдеров (`/batch_mail/tracking/mail_provider`) и логи (`/batch_mail/tracking/logs`).
   - `GET /api/analytics/domains` и `GET /api/analytics/mailboxes` возвращают агрегаты только по данным текущего пользователя (`account_id` из сессии + фильтрация по `account_domain`/`account_mailbox`).
   - `POST /api/email_template/create` создаёт шаблон в BillionMail и сохраняет связь пользователя с шаблоном в `account_template`.

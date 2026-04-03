@@ -111,48 +111,48 @@ const domainColumns: ColumnsType<DomainAnalyticsItem> = [
     render: (value: number) => formatNumber(value),
   },
   {
-    title: 'Success Rate',
+    title: 'Процент успешных',
     dataIndex: 'success_rate',
     key: 'success_rate',
     sorter: (a, b) => a.success_rate - b.success_rate,
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Completion',
+    title: 'Выполнение',
     dataIndex: 'completion_rate',
     key: 'completion_rate',
     sorter: (a, b) => a.completion_rate - b.completion_rate,
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Mailboxes',
+    title: 'Почтовые ящики',
     key: 'mailboxes',
     render: (_, record) =>
       `${formatNumber(record.active_mailboxes_total)} / ${formatNumber(record.mailboxes_total)}`,
   },
   {
-    title: 'DNS Health',
+    title: 'Состояние DNS',
     dataIndex: 'dns_health_rate',
     key: 'dns_health_rate',
     sorter: (a, b) => a.dns_health_rate - b.dns_health_rate,
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Blacklist',
+    title: 'Черный список',
     dataIndex: 'blacklist_total',
     key: 'blacklist_total',
     sorter: (a, b) => a.blacklist_total - b.blacklist_total,
     render: (value: number) => formatNumber(value),
   },
   {
-    title: 'SSL Expire',
+    title: 'Срок SSL',
     dataIndex: 'ssl_expires_in_days',
     key: 'ssl_expires_in_days',
     sorter: (a, b) => (a.ssl_expires_in_days || 0) - (b.ssl_expires_in_days || 0),
     render: (value: number | null) => formatDaysToExpire(value),
   },
   {
-    title: 'Quota',
+    title: 'Квота',
     key: 'quota_usage',
     render: (_, record) =>
       `${formatPercent(record.quota_usage_rate)} (${formatQuota(record.current_usage, record.quota)})`,
@@ -214,27 +214,27 @@ const mailboxColumns: ColumnsType<MailboxAnalyticsItem> = [
     render: (value: number) => formatNumber(value),
   },
   {
-    title: 'Success Rate',
+    title: 'Процент успешных',
     dataIndex: 'success_rate',
     key: 'success_rate',
     sorter: (a, b) => a.success_rate - b.success_rate,
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Completion',
+    title: 'Выполнение',
     dataIndex: 'completion_rate',
     key: 'completion_rate',
     sorter: (a, b) => a.completion_rate - b.completion_rate,
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Quota',
+    title: 'Квота',
     key: 'quota_usage',
     render: (_, record) =>
       `${formatPercent(record.quota_usage_rate)} (${formatQuota(record.used_quota, record.quota)})`,
   },
   {
-    title: 'DNS Health',
+    title: 'Состояние DNS',
     dataIndex: 'domain_dns_health_rate',
     key: 'domain_dns_health_rate',
     sorter: (a, b) => a.domain_dns_health_rate - b.domain_dns_health_rate,
@@ -274,13 +274,13 @@ const topDomainColumns: ColumnsType<TopDomainMetric> = [
     render: (value: number) => formatNumber(value),
   },
   {
-    title: 'Success Rate',
+    title: 'Процент успешных',
     dataIndex: 'success_rate',
     key: 'success_rate',
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Failed',
+    title: 'Сбоев',
     dataIndex: 'failed_total',
     key: 'failed_total',
     render: (value: number) => formatNumber(value),
@@ -306,19 +306,19 @@ const topMailboxColumns: ColumnsType<TopMailboxMetric> = [
     render: (value: number) => formatNumber(value),
   },
   {
-    title: 'Success Rate',
+    title: 'Процент успешных',
     dataIndex: 'success_rate',
     key: 'success_rate',
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Quota Usage',
+    title: 'Использование квоты',
     dataIndex: 'quota_usage_rate',
     key: 'quota_usage_rate',
     render: (value: number) => formatPercent(value),
   },
   {
-    title: 'Failed',
+    title: 'Сбоев',
     dataIndex: 'failed_total',
     key: 'failed_total',
     render: (value: number) => formatNumber(value),
@@ -444,7 +444,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isDomainsLoading}>
                       <Statistic
-                        title="Success Rate"
+                        title="Процент успешных"
                         value={domainData?.summary.success_rate || 0}
                         suffix="%"
                         precision={2}
@@ -463,7 +463,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isDomainsLoading}>
                       <Statistic
-                        title="DNS Health (avg)"
+                        title="Состояние DNS (среднее)"
                         value={domainData?.summary.average_dns_health_rate || 0}
                         suffix="%"
                         precision={2}
@@ -473,7 +473,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isDomainsLoading}>
                       <Statistic
-                        title="Blacklisted"
+                        title="В черных списках"
                         value={domainData?.summary.blacklisted_domains || 0}
                         formatter={(value) => formatNumber(Number(value))}
                       />
@@ -482,7 +482,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isDomainsLoading}>
                       <Statistic
-                        title="Quota Usage"
+                        title="Использование квоты"
                         value={domainData?.summary.quota_usage_rate || 0}
                         suffix="%"
                         precision={2}
@@ -565,7 +565,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isMailboxesLoading}>
                       <Statistic
-                        title="Mailbox"
+                        title="Почтовых ящиков"
                         value={mailboxData?.summary.mailboxes_total || 0}
                         formatter={(value) => formatNumber(Number(value))}
                       />
@@ -574,7 +574,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isMailboxesLoading}>
                       <Statistic
-                        title="Активных mailbox"
+                        title="Активных ящиков"
                         value={mailboxData?.summary.active_mailboxes || 0}
                         formatter={(value) => formatNumber(Number(value))}
                       />
@@ -601,7 +601,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isMailboxesLoading}>
                       <Statistic
-                        title="Success Rate"
+                        title="Процент успешных"
                         value={mailboxData?.summary.success_rate || 0}
                         suffix="%"
                         precision={2}
@@ -620,7 +620,7 @@ export const SettingAnalytics = () => {
                   <Col span={6}>
                     <Card loading={isMailboxesLoading}>
                       <Statistic
-                        title="Quota Usage"
+                        title="Использование квоты"
                         value={mailboxData?.summary.quota_usage_rate || 0}
                         suffix="%"
                         precision={2}

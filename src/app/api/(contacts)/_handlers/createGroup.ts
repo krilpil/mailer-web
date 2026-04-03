@@ -44,7 +44,7 @@ const resolveCreatedGroupId = async (
 
   const listBody = (await listContactGroupsAll(groupName)).data;
   if (!listBody?.success) {
-    throw new Error(listBody?.msg ?? 'Failed to resolve group id');
+    throw new Error('Не удалось определить идентификатор группы');
   }
 
   const matchedGroup = (listBody.data?.list ?? [])
@@ -58,7 +58,7 @@ const resolveCreatedGroupId = async (
     .sort((left, right) => Number(right.create_time ?? 0) - Number(left.create_time ?? 0))[0];
 
   if (!matchedGroup?.id) {
-    throw new Error('Failed to resolve group id');
+    throw new Error('Не удалось определить идентификатор группы');
   }
 
   return Number(matchedGroup.id);
@@ -82,14 +82,14 @@ export async function POST(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<ICreateGroupResponse>(
-      { success: false, msg: 'Unauthorized' },
+      { success: false, msg: 'Требуется авторизация' },
       { status: 401 }
     );
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json<ICreateGroupResponse>(
-      { success: false, msg: 'Mail API is not configured', error: 'contact_group_create_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'contact_group_create_failed' },
       { status: 500 }
     );
   }
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
     return NextResponse.json<ICreateGroupResponse>(
       {
         success: false,
-        msg: 'Failed to generate group id',
+        msg: 'Не удалось сгенерировать идентификатор группы',
         error: 'contact_group_create_failed',
       },
       { status: 500 }
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
     return NextResponse.json<ICreateGroupResponse>(
       {
         success: false,
-        msg: 'Failed to generate unique group id',
+        msg: 'Не удалось подобрать уникальный идентификатор группы',
         error: 'contact_group_create_failed',
       },
       { status: 500 }
@@ -148,8 +148,8 @@ export async function POST(request: Request) {
       return NextResponse.json<ICreateGroupResponse>(
         {
           success: false,
-          msg: providerBody?.msg ?? 'Failed to create group',
-          error: providerBody?.error ?? 'contact_group_create_failed',
+          msg: 'Не удалось создать группу',
+          error: 'contact_group_create_failed',
         },
         { status: 500 }
       );
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
       return NextResponse.json<ICreateGroupResponse>(
         {
           success: false,
-          msg: error.response?.data?.error ?? error.response?.data?.msg ?? 'Failed to create group',
+          msg: 'Не удалось создать группу',
           error: 'contact_group_create_failed',
         },
         { status: 500 }
@@ -169,7 +169,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json<ICreateGroupResponse>(
-      { success: false, msg: 'Failed to create group', error: 'contact_group_create_failed' },
+      { success: false, msg: 'Не удалось создать группу', error: 'contact_group_create_failed' },
       { status: 500 }
     );
   }
@@ -189,14 +189,14 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json<ICreateGroupResponse>(
-      { success: false, msg: 'Failed to save group', error: 'account_recipient_create_failed' },
+      { success: false, msg: 'Не удалось сохранить группу', error: 'account_recipient_create_failed' },
       { status: 500 }
     );
   }
 
   const response: ICreateGroupResponse = {
     success: true,
-    msg: 'OK',
+    msg: 'Успешно',
     data: {
       group_id: persistedGroupId,
       name: normalizedName,

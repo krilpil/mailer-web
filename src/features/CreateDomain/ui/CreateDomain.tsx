@@ -95,7 +95,6 @@ export const CreateDomain = () => {
           data: { ...prevState.data, otpCode },
         }));
         handleClose();
-        console.log(form);
       })
       .catch((error) => {
         const status = (error as { details?: { status?: number } })?.details?.status;

@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     return NextResponse.json<IListGroupContactsResponse>(
       {
         success: false,
-        msg: 'Invalid group_id',
+        msg: 'Некорректная группа',
         error: 'contact_group_contacts_failed',
         data: emptyList,
       },
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IListGroupContactsResponse>(
-      { success: false, msg: 'Unauthorized', data: emptyList },
+      { success: false, msg: 'Требуется авторизация', data: emptyList },
       { status: 401 }
     );
   }
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
     return NextResponse.json<IListGroupContactsResponse>(
       {
         success: false,
-        msg: 'Mail API is not configured',
+        msg: 'Почтовый API не настроен',
         error: 'contact_group_contacts_failed',
         data: emptyList,
       },
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
       return NextResponse.json<IListGroupContactsResponse>(
         {
           success: false,
-          msg: 'Group is not available',
+          msg: 'Группа недоступна',
           error: 'contact_group_access_denied',
           data: emptyList,
         },
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
     return NextResponse.json<IListGroupContactsResponse>(
       {
         success: false,
-        msg: 'Failed to check group access',
+        msg: 'Не удалось проверить доступ к группе',
         error: 'contact_group_contacts_failed',
         data: emptyList,
       },
@@ -113,8 +113,8 @@ export async function GET(request: Request) {
         return NextResponse.json<IListGroupContactsResponse>(
           {
             success: false,
-            msg: providerBody?.msg ?? 'Failed to fetch group contacts',
-            error: providerBody?.error ?? 'contact_group_contacts_failed',
+            msg: 'Не удалось получить список пользователей группы',
+            error: 'contact_group_contacts_failed',
             data: emptyList,
           },
           { status: 500 }
@@ -150,7 +150,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json<IListGroupContactsResponse>({
       success: true,
-      msg: 'OK',
+      msg: 'Успешно',
       data: {
         total: list.length,
         list,
@@ -161,10 +161,7 @@ export async function GET(request: Request) {
       return NextResponse.json<IListGroupContactsResponse>(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to fetch group contacts',
+          msg: 'Не удалось получить список пользователей группы',
           error: 'contact_group_contacts_failed',
           data: emptyList,
         },
@@ -175,7 +172,7 @@ export async function GET(request: Request) {
     return NextResponse.json<IListGroupContactsResponse>(
       {
         success: false,
-        msg: 'Failed to fetch group contacts',
+        msg: 'Не удалось получить список пользователей группы',
         error: 'contact_group_contacts_failed',
         data: emptyList,
       },

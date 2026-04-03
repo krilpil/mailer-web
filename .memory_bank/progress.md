@@ -2,11 +2,24 @@
 
 ## Status
 
+- Выполнен визуальный редизайн auth-экранов `/sign-in` и `/sign-up`: добавлен hero-блок с ценностным предложением и усилен первый экран взаимодействия.
+- Формы входа/регистрации интегрированы в обновленные стеклянные карточки с более сильной иерархией и адаптивным поведением от desktop до mobile.
+- Валидность после UI-правок подтверждена: `yarn exec tsc --noEmit` завершен успешно.
+- Добавлена базовая адаптивность приложения: responsive layout-shell (desktop sidebar + mobile drawer), адаптивный header и безопасное поведение контента/таблиц на узких экранах.
+- Выполнена визуальная полировка интерфейса: обновлены `GlobalStyle`, токены/компоненты Ant Design и ключевые UI-экраны (auth/pages/editor/navigation) для более цельного и аккуратного вида.
+- Подтверждена типобезопасность текущего состояния UI: `yarn exec tsc --noEmit` проходит без ошибок.
+- Навигация обновлена: `SideMenu` переведен на `antd Menu` с иконками разделов и sticky-поведением при скролле.
+- Для регистрации добавлено ограничение пароля: минимум 6 символов на клиенте (`SignUpForm`) и сервере (`POST /api/sign-up`).
+- В `GET /api/batch_mail/task/list` добавлена проверка авторизации и фильтрация задач по ownership текущего аккаунта (template/group/mailbox/domain).
+- Список `/mailings` теперь получает только собственные задачи пользователя; пагинация в ответе считается после ownership-фильтра.
+- Обновлены `docs/API.md`, `README.md` и `.memory_bank/modules/mailing.md` под новое правило доступа к рассылкам.
+- Закрыта задача по заголовкам вкладок: для всех страниц App Router добавлены `metadata.title`, а в `src/app/layout.tsx` включен `title.template` (`%s | Mailfinch Core`).
+- Повторная проверка подтвердила, что после добавления page-title прод-сборка проходит: `yarn build:prod` успешно завершён.
+- Проверка истории изменений: `git log 507610a..HEAD` содержит коммит `08f2133 feat(analytic): добавлена страница с аналитикой`; `last_checked_commit` обновлён.
 - Закрыт свежий блокер `yarn build:prod`: в `SettingAnalytics` устранен конфликт типов `Dayjs` при работе `RangePicker` (state диапазона переведен на Unix-метки).
 - Повторная сборка подтверждена: `yarn build:prod` успешно проходит (`compile + TypeScript + prerender`).
 - Закрыт блокер сборки: `npm run build:prod` проходит успешно (Next.js compile + TypeScript + prerender).
 - Исправлены несовместимости типов после обновлений (`yup@1.7`, `antd Select`, строгий TS): `sendMail` error-response, `parseAndValidate`, response-validators auth/domain/mailbox, типизация multi-select для групп получателей.
-- Проверка истории изменений: `git log 507610a..HEAD` пустой, новых коммитов относительно `last_checked_commit` нет.
 - Реализован новый приватный раздел `/analytics` с account-scoped аналитикой по доменам и mailbox отправителей: серверные endpoint'ы `GET /api/analytics/domains` и `GET /api/analytics/mailboxes`, клиентские хуки `useGetDomainsAnalytics`/`useGetMailboxesAnalytics`, UI с KPI, top-таблицами и timeline.
 - Для UI аналитики добавлены loader-состояния в компонентах, ожидающих данные (`SettingAnalytics`, `ViewMailingTaskAnalytics`): первичная загрузка отображается через `Card/Table loading`.
 - Базовая документация и Memory Bank заполнены; добавлен эндпоинт обновления DNS записей; сформирован SQL для таблицы доменов аккаунта и уточнён тип `accounts.id`; добавлено сохранение домена и фильтрация списка по `account_domain`; включена проверка JWT для API; подготовлен SQL для `account_mailbox` с уникальным `username` и жёсткой привязкой домена; требуется UNIQUE/PK на `(account_id, domain)` в `account_domain`; добавлена запись mailbox при создании домена; добавлены приватные страницы `/mailboxes` и `/mailing/new`; добавлены серверный/клиентский эндпоинты списка mailbox и таблица на странице; добавлен эндпоинт удаления mailbox с проверкой доступа; добавлен OTP-флоу создания mailbox; `deleteDomain` терпимо обрабатывает отсутствие mailbox; добавлены модульные заметки для доменов и mailbox; базовый перенос `MailerEditor` завершён без store и без кастомных NodeView; добавлены `EditorFloatingMenu`, `EditorPositionMenu`, `EditorBubbleMenu` с логикой из `frontend_employee`, адаптированной под базовые extension’ы; старый email-ввод в `AddRecipientMailer` удален и заменен выбором пользовательских групп через `antd Select mode="multiple"`; `selectedGroupIds` подняты в `MailingPage`; устранены предупреждения AntD/Tiptap и ранний доступ к `editor.view`; `title/content` редактора вынесены на уровень `MailingPage`; добавлен базовый `EmailTemplate` на `@react-email/components` с типизированными пропсами и дефолтами; реализован рендер TipTap `JSONContent` в `EmailTemplate` и подключена передача `content` из `MailingPage` в рендер письма; в `EditorBubbleMenu` добавлена авто-нормализация URL (`https://` для ссылок без протокола); добавлены серверные и клиентские endpoint групп контактов (`create/delete/list/import/remove recipient`) с проверкой доступа по `account_recipient`; реализована страница `/contacts` с таблицей групп, просмотром пользователей группы и удалением пользователей из выбранной группы.
@@ -28,6 +41,20 @@
 
 ## Completed
 
+- `SignInPage` и `SignUpPage` переработаны в полноценные hero-экраны: бренд-бейдж, крупный заголовок, список преимуществ, объясняющий блок и усиленный form-card.
+- Для auth-страниц добавлены визуальные эффекты и адаптивные grid-правила: мягкие градиенты, фоновые акцентные blobs, адаптация в одну колонку на мобильных.
+- Реализован responsive shell в `PrivateLayout`: на desktop фиксированный sidebar, на mobile `Drawer` с `SideMenu` и закрытием по навигации.
+- Обновлены `Header`/`SideMenu` под единый UI-язык: иконки разделов, mobile menu trigger, улучшенные состояния элементов.
+- Расширена адаптивность ключевых таблиц и форм (`SettingMailings`, `SettingMailboxes`, `SettingDomains`, `SettingTemplates`, `SettingContacts`, `DNSRecords`, `MailerEditor`).
+- Настроены базовые UI-токены Ant Design и глобальные стили приложения для более чистого визуального ритма.
+- `src/widgets/SideMenu` переведен с кастомного списка ссылок на `antd Menu`, добавлены иконки разделов и `antd Button` для выхода.
+- Для `SideMenu` добавлены sticky-стили (`position: sticky`, `top: 0`, `height: 100vh`, `overflow-y: auto`) для фиксации при прокрутке.
+- Обновлена валидация регистрации: пароль короче 6 символов отклоняется как в UI-форме, так и в server-side Yup-схеме `verifyOTPSignUpPayloadValidate`.
+- Для `GET /api/batch_mail/task/list` реализован account-scoped доступ к задачам по ownership-таблицам: `account_template`, `account_recipient`, `account_mailbox`, `account_domain`.
+- В ответе `/api/batch_mail/task/list` включена локальная пагинация после ownership-фильтрации, чтобы UI `/mailings` работал только с разрешёнными задачами.
+- Документация обновлена: `docs/API.md`, `README.md`, `.memory_bank/modules/mailing.md`.
+- Для всех страниц `src/app/**/page.tsx` добавлены `metadata.title` (`/`, `/sign-in`, `/sign-up`, `/settings`, `/mailboxes`, `/mailing`, `/mailings`, `/templates`, `/contacts`).
+- В корневом `src/app/layout.tsx` добавлен шаблон заголовка: `title.default = Mailfinch Core`, `title.template = %s | Mailfinch Core`.
 - Добавлены endpoint'ы `GET /api/analytics/domains` и `GET /api/analytics/mailboxes` (route-group `(analytics)`), с валидацией query и проверкой account ownership.
 - Реализован серверный агрегатор account analytics (`buildAccountAnalyticsSource`) с объединением данных BillionMail и локальных таблиц (`account_domain`, `account_mailbox`).
 - Добавлена клиентская сущность `entities/analytics` с хуками `useGetDomainsAnalytics` и `useGetMailboxesAnalytics`.
@@ -129,6 +156,14 @@
 
 ## Changelog
 
+- `SideMenu` обновлен: переход на `antd Menu`, добавлены иконки пунктов и sticky-поведение сайдбара при скролле.
+- Регистрация: добавлен `min(6)` для `password` в `src/entities/session/ui/SignUpForm/SignUpForm.tsx` и `src/app/api/(auth)/sign-up/signUp.validation.ts`.
+- Для `GET /api/batch_mail/task/list` добавлена серверная проверка авторизации и фильтрация задач по ownership текущего аккаунта (`account_template`, `account_recipient`, `account_mailbox`, `account_domain`).
+- В `/api/batch_mail/task/list` добавлена локальная пагинация после фильтрации ownership, чтобы `SettingMailings` возвращал только разрешённые задачи.
+- Обновлена документация по batch-рассылкам и доступу: `docs/API.md`, `README.md`, `.memory_bank/modules/mailing.md`.
+- Для всех страниц App Router добавлены `metadata.title`; в `src/app/layout.tsx` настроен единый формат заголовка вкладки: `%s | Mailfinch Core`.
+- Удалены лишние директивы `'use server'` из файлов `src/app/**/page.tsx`, чтобы использовать стандартный экспорт `metadata` без конфликтов с правилами Server Actions.
+- Повторная проверка сборки после обновления title: `yarn build:prod` проходит успешно.
 - Исправлен TypeScript-конфликт в `src/widgets/SettingAnalytics/ui/SettingAnalytics.tsx`: состояние диапазона дат изменено с `[Dayjs, Dayjs]` на `[number, number]` (Unix), добавлено вычисляемое `rangePickerValue` для `RangePicker`, обновлены `periodPayload` и рендер периода.
 - После правки `SettingAnalytics` подтверждена успешная прод-сборка командой `yarn build:prod`.
 - Исправлены ошибки прод-сборки: синхронизированы типы `yup`-валидаторов и DTO (`sendMail`, `parseAndValidate`, `sendOTPSignUp`, `getDomainsList`, `deleteMailbox`, `freshDNSRecords`), а также `Select<number[]>` для multi-select сценариев групп; `build:prod` успешно завершён.
@@ -205,5 +240,5 @@
 
 ## Контроль изменений
 
-- last_checked_commit: 507610a
-- last_checked_date: 2026-04-02
+- last_checked_commit: 08f2133
+- last_checked_date: 2026-04-03

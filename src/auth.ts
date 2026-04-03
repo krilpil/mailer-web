@@ -23,10 +23,11 @@ export const { handlers, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   pages: { signIn: routes.AUTH_PAGE, signOut: routes.REGISTER_PAGE },
   session: { strategy: 'jwt' },
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        email: { label: 'Электронная почта', type: 'email' },
         password: { label: 'Пароль', type: 'password' },
       },
       async authorize(credentials) {

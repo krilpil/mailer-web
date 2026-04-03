@@ -30,14 +30,18 @@ export async function POST(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'Unauthorized' },
+      { success: false, msg: 'Требуется авторизация' },
       { status: 401 }
     );
   }
 
   if (parsed.local_part.includes('@')) {
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'Invalid local part', error: 'mailbox_create_failed' },
+      {
+        success: false,
+        msg: 'Некорректная часть адреса до символа @',
+        error: 'mailbox_create_failed',
+      },
       { status: 400 }
     );
   }
@@ -54,13 +58,13 @@ export async function POST(request: Request) {
 
     if ((rows as Array<unknown>).length === 0) {
       return NextResponse.json<ICreateMailboxResponse>(
-        { success: false, msg: 'Domain is not available', error: 'domain_access_denied' },
+        { success: false, msg: 'Домен недоступен', error: 'domain_access_denied' },
         { status: 403 }
       );
     }
   } catch {
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'Failed to check domain access', error: 'domain_access_failed' },
+      { success: false, msg: 'Не удалось проверить доступ к домену', error: 'domain_access_failed' },
       { status: 500 }
     );
   }
@@ -74,21 +78,25 @@ export async function POST(request: Request) {
     });
   } catch {
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'Failed to verify OTP', error: 'mailbox_create_failed' },
+      { success: false, msg: 'Не удалось подтвердить код', error: 'mailbox_create_failed' },
       { status: 500 }
     );
   }
 
   if (otpResult.status === 'otp_not_found') {
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'OTP not found', error: 'mailbox_create_failed' },
+      {
+        success: false,
+        msg: 'Код подтверждения не найден или истек',
+        error: 'mailbox_create_failed',
+      },
       { status: 404 }
     );
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'Mail API is not configured', error: 'mailbox_create_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'mailbox_create_failed' },
       { status: 500 }
     );
   }
@@ -109,8 +117,8 @@ export async function POST(request: Request) {
       return NextResponse.json<ICreateMailboxResponse>(
         {
           success: false,
-          msg: mailboxBody?.msg ?? 'Failed to create mailbox',
-          error: mailboxBody?.error ?? 'mailbox_create_failed',
+          msg: 'Не удалось создать почтовый ящик',
+          error: 'mailbox_create_failed',
         },
         { status: 500 }
       );
@@ -120,10 +128,7 @@ export async function POST(request: Request) {
       return NextResponse.json<ICreateMailboxResponse>(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to create mailbox',
+          msg: 'Не удалось создать почтовый ящик',
           error: 'mailbox_create_failed',
         },
         { status: 500 }
@@ -131,7 +136,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'Failed to create mailbox', error: 'mailbox_create_failed' },
+      {
+        success: false,
+        msg: 'Не удалось создать почтовый ящик',
+        error: 'mailbox_create_failed',
+      },
       { status: 500 }
     );
   }
@@ -146,11 +155,15 @@ export async function POST(request: Request) {
     );
   } catch {
     return NextResponse.json<ICreateMailboxResponse>(
-      { success: false, msg: 'Failed to save mailbox', error: 'account_mailbox_create_failed' },
+      {
+        success: false,
+        msg: 'Не удалось сохранить почтовый ящик',
+        error: 'account_mailbox_create_failed',
+      },
       { status: 500 }
     );
   }
 
-  const response: ICreateMailboxResponse = { success: true, msg: 'OK' };
+  const response: ICreateMailboxResponse = { success: true, msg: 'Успешно' };
   return NextResponse.json<ICreateMailboxResponse>(response);
 }

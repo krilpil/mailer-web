@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IDeleteMailboxResponse>(
-      { success: false, msg: 'Unauthorized' },
+      { success: false, msg: 'Требуется авторизация' },
       { status: 401 }
     );
   }
@@ -36,7 +36,11 @@ export async function POST(request: Request) {
   const atIndex = parsed.username.lastIndexOf('@');
   if (atIndex <= 0 || atIndex === parsed.username.length - 1) {
     return NextResponse.json<IDeleteMailboxResponse>(
-      { success: false, msg: 'Invalid mailbox username', error: 'mailbox_delete_failed' },
+      {
+        success: false,
+        msg: 'Некорректный адрес почтового ящика',
+        error: 'mailbox_delete_failed',
+      },
       { status: 400 }
     );
   }
@@ -47,7 +51,7 @@ export async function POST(request: Request) {
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json<IDeleteMailboxResponse>(
-      { success: false, msg: 'Mail API is not configured', error: 'mailbox_delete_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'mailbox_delete_failed' },
       { status: 500 }
     );
   }
@@ -67,14 +71,18 @@ export async function POST(request: Request) {
 
       if ((domainRows as Array<unknown>).length === 0) {
         return NextResponse.json<IDeleteMailboxResponse>(
-          { success: false, msg: 'Mailbox is not available', error: 'mailbox_access_denied' },
+          { success: false, msg: 'Почтовый ящик недоступен', error: 'mailbox_access_denied' },
           { status: 403 }
         );
       }
     }
   } catch {
     return NextResponse.json<IDeleteMailboxResponse>(
-      { success: false, msg: 'Failed to check mailbox access', error: 'mailbox_delete_failed' },
+      {
+        success: false,
+        msg: 'Не удалось проверить доступ к почтовому ящику',
+        error: 'mailbox_delete_failed',
+      },
       { status: 500 }
     );
   }
@@ -87,8 +95,8 @@ export async function POST(request: Request) {
       return NextResponse.json<IDeleteMailboxResponse>(
         {
           success: false,
-          msg: deleteBody?.msg ?? 'Failed to delete mailbox',
-          error: deleteBody?.error ?? 'mailbox_delete_failed',
+          msg: 'Не удалось удалить почтовый ящик',
+          error: 'mailbox_delete_failed',
         },
         { status: 500 }
       );
@@ -98,10 +106,7 @@ export async function POST(request: Request) {
       return NextResponse.json<IDeleteMailboxResponse>(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to delete mailbox',
+          msg: 'Не удалось удалить почтовый ящик',
           error: 'mailbox_delete_failed',
         },
         { status: 500 }
@@ -109,7 +114,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json<IDeleteMailboxResponse>(
-      { success: false, msg: 'Failed to delete mailbox', error: 'mailbox_delete_failed' },
+      {
+        success: false,
+        msg: 'Не удалось удалить почтовый ящик',
+        error: 'mailbox_delete_failed',
+      },
       { status: 500 }
     );
   }
@@ -124,6 +133,6 @@ export async function POST(request: Request) {
     // Best-effort cleanup only.
   }
 
-  const response: IDeleteMailboxResponse = { success: true, msg: 'OK' };
+  const response: IDeleteMailboxResponse = { success: true, msg: 'Успешно' };
   return NextResponse.json<IDeleteMailboxResponse>(response);
 }

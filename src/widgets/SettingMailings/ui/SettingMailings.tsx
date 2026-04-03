@@ -62,7 +62,7 @@ export const SettingMailings = () => {
           onSearch={handleSearch}
           enterButton="Искать"
           allowClear
-          style={{ width: 320 }}
+          style={{ width: 'min(100%, 360px)' }}
         />
 
         <Button onClick={handleReset}>Сбросить</Button>

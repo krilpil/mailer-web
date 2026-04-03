@@ -26,7 +26,7 @@ const normalizeResponse = (raw: unknown): IGetMailboxesAnalyticsResponse => {
 
   return {
     success: source.success === true,
-    msg: toString(source.msg) || 'OK',
+    msg: toString(source.msg) || 'Успешно',
     code: toNumberOrUndefined(source.code),
     error: toString(source.error) || undefined,
     data: isObject(source.data) ? (source.data as unknown as MailboxesAnalyticsData) : null,

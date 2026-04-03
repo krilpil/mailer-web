@@ -4,7 +4,6 @@ export const routes = {
   NOT_FOUND: '/not-found',
 
   HOME_PAGE: '/',
-  ANALYTICS_PAGE: '/analytics',
   MAILINGS_PAGE: '/mailings',
   NEW_TEMPLATE_PAGE: '/mailing',
   TEMPLATES_PAGE: '/templates',

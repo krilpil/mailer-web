@@ -16,7 +16,12 @@ export const StyledComponentsProvider = ({ children }: PropsWithChildren) => {
   });
 
   if (typeof window !== 'undefined') {
-    return <>{children}</>;
+    return (
+      <>
+        <GlobalStyle />
+        {children}
+      </>
+    );
   }
 
   return (

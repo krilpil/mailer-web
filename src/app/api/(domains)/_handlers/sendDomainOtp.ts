@@ -23,7 +23,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
       return NextResponse.json(
         {
           success: false,
-          msg: mailBody?.msg ?? 'Failed to send OTP email',
+          msg: 'Не удалось отправить код подтверждения',
           error: 'mail_failed',
         },
         { status: 500 }
@@ -34,7 +34,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
       return NextResponse.json(
         {
           success: false,
-          msg: error.response?.data?.error ?? 'Failed to send OTP email',
+          msg: 'Не удалось отправить код подтверждения',
           error: 'mail_failed',
         },
         { status: 500 }
@@ -42,7 +42,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
     }
 
     return NextResponse.json(
-      { success: false, msg: 'Failed to send OTP email', error: 'mail_failed' },
+      { success: false, msg: 'Не удалось отправить код подтверждения', error: 'mail_failed' },
       { status: 500 }
     );
   }
@@ -84,6 +84,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json<ISendOTPCreateDomainResponse>(response);
   } catch {
-    return NextResponse.json({ success: false, msg: 'Failed to create OTP' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, msg: 'Не удалось создать код подтверждения' },
+      { status: 500 }
+    );
   }
 }

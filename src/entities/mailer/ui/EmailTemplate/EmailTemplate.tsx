@@ -138,7 +138,7 @@ const renderInlineNodes = (nodes: JSONContent[], keyPrefix: string): ReactNode[]
       const src = getStringAttr(node, 'src');
       if (!src) return null;
 
-      const alt = getStringAttr(node, 'alt') || 'image';
+      const alt = getStringAttr(node, 'alt') || 'изображение';
 
       return <Img key={key} src={src} alt={alt} style={imageStyle} />;
     }
@@ -251,7 +251,7 @@ const renderBlockNode = (node: JSONContent, key: string): ReactNode => {
     const src = getStringAttr(node, 'src');
     if (!src) return null;
 
-    const alt = getStringAttr(node, 'alt') || 'image';
+    const alt = getStringAttr(node, 'alt') || 'изображение';
 
     return (
       <Section key={key} style={imageSectionStyle}>

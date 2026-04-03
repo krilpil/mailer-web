@@ -13,7 +13,7 @@ export const buildRecipientsColumns: BuildRecipientsColumns = ({
   removingEmail,
 }) => [
   {
-    title: 'Email',
+    title: 'Эл. почта',
     dataIndex: 'email',
     key: 'email',
   },

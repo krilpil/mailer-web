@@ -14,7 +14,7 @@ export const buildGroupsColumns: BuilderGroupsColumns = ({
   deletingGroupId,
 }) => [
   {
-    title: 'ID группы',
+    title: 'Идентификатор группы',
     dataIndex: 'group_id',
     key: 'group_id',
   },

@@ -46,7 +46,7 @@ export async function GET() {
     return NextResponse.json<IListUserTemplatesResponse>(
       {
         success: false,
-        msg: 'Unauthorized',
+        msg: 'Требуется авторизация',
         error: 'email_template_access_denied',
         data: emptyData,
       },
@@ -75,7 +75,7 @@ export async function GET() {
 
     return NextResponse.json<IListUserTemplatesResponse>({
       success: true,
-      msg: 'OK',
+      msg: 'Успешно',
       data: {
         total: list.length,
         list,
@@ -85,7 +85,7 @@ export async function GET() {
     return NextResponse.json<IListUserTemplatesResponse>(
       {
         success: false,
-        msg: 'Failed to fetch templates',
+        msg: 'Не удалось получить список шаблонов',
         error: 'email_template_list_failed',
         data: emptyData,
       },

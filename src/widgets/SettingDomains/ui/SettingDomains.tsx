@@ -54,6 +54,7 @@ export const SettingDomains = () => {
         dataSource={tableDataSource}
         pagination={false}
         loading={getDomainsList.isFetching}
+        scroll={{ x: 980 }}
       />
     </div>
   );

@@ -9,12 +9,23 @@ import { SignInForm } from '@/entities/session';
 import { SignInPageProps } from '../model/signInPage.types';
 import {
   SPage,
+  SContainer,
+  SHero,
+  SFeatureList,
+  SFeatureItem,
+  SQuote,
+  SFormColumn,
   SCard,
   SBrand,
   SBrandName,
+  SBrandBadge,
   STitle,
   SSubtitle,
+  SCardTop,
+  SCardTitle,
+  SCardDescription,
   SFormSection,
+  SFootnote,
 } from './SignInPage.styles';
 
 export const SignInPage = ({ callbackUrl }: SignInPageProps) => {
@@ -24,7 +35,7 @@ export const SignInPage = ({ callbackUrl }: SignInPageProps) => {
   const handleSignIn = async (values: { email: string; password: string }) => {
     const result = await signIn('credentials', { ...values, redirect: false });
 
-    if (result?.error) return 'Неверный email или пароль';
+    if (result?.error) return 'Неверный адрес электронной почты или пароль';
 
     const redirectTo = result?.url ?? safeCallbackUrl;
     router.push(redirectTo);
@@ -34,18 +45,48 @@ export const SignInPage = ({ callbackUrl }: SignInPageProps) => {
 
   return (
     <SPage>
-      <SBrand>
-        <SBrandName>MAILFINCH</SBrandName>
-      </SBrand>
+      <SContainer>
+        <SHero>
+          <SBrand>
+            <SBrandName>MAILFINCH</SBrandName>
+            <SBrandBadge>Smart Email Platform</SBrandBadge>
+          </SBrand>
 
-      <STitle>Добро пожаловать</STitle>
-      <SSubtitle>Войдите в свою учетную запись, чтобы продолжить</SSubtitle>
+          <STitle>Почтовая панель для вашего продукта</STitle>
+          <SSubtitle>
+            Управляйте доменами, ящиками, шаблонами и рассылками в одном аккуратном пространстве.
+            Быстро, безопасно и без лишних шагов.
+          </SSubtitle>
 
-      <SCard>
-        <SFormSection>
-          <SignInForm onSubmit={handleSignIn} />
-        </SFormSection>
-      </SCard>
+          <SFeatureList>
+            <SFeatureItem>Единый контроль доменов, DNS и отправителей</SFeatureItem>
+            <SFeatureItem>Шаблоны, аудитории и рассылки без ручной рутины</SFeatureItem>
+            <SFeatureItem>Понятная аналитика по доставляемости и активности</SFeatureItem>
+          </SFeatureList>
+
+          <SQuote>
+            Вход занимает секунды. После входа вы сразу попадаете в рабочее пространство без лишних
+            экранов и скрытых действий.
+          </SQuote>
+        </SHero>
+
+        <SFormColumn>
+          <SCard>
+            <SCardTop>
+              <SCardTitle>Вход в аккаунт</SCardTitle>
+              <SCardDescription>
+                Используйте рабочий email и пароль, чтобы продолжить работу в Mailfinch.
+              </SCardDescription>
+            </SCardTop>
+            <SFormSection>
+              <SignInForm onSubmit={handleSignIn} />
+            </SFormSection>
+            <SFootnote>
+              Защищенное соединение и безопасная авторизация включены по умолчанию.
+            </SFootnote>
+          </SCard>
+        </SFormColumn>
+      </SContainer>
     </SPage>
   );
 };

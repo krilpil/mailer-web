@@ -6,5 +6,5 @@ export const verifyOTPSignUpPayloadValidate: ObjectSchema<IVerifyOTPSignUpPayloa
   otp_guid: string().required(),
   email: string().required(),
   otp_code: string().required(),
-  password: string().required(),
+  password: string().min(6).required(),
 }).required();

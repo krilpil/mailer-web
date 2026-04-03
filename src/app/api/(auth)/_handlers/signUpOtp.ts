@@ -20,7 +20,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
       return NextResponse.json<ISendOTPSignUpResponse>(
         {
           success: false,
-          msg: mailBody?.msg ?? 'Failed to send OTP email',
+          msg: 'Не удалось отправить код подтверждения',
           error: 'mail_failed',
         },
         { status: 500 }
@@ -31,7 +31,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
       return NextResponse.json<ISendOTPSignUpResponse>(
         {
           success: false,
-          msg: error.response?.data?.error ?? 'Failed to send OTP email',
+          msg: 'Не удалось отправить код подтверждения',
           error: 'mail_failed',
         },
         { status: 500 }
@@ -39,7 +39,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
     }
 
     return NextResponse.json<ISendOTPSignUpResponse>(
-      { success: false, msg: 'Failed to send OTP email', error: 'mail_failed' },
+      { success: false, msg: 'Не удалось отправить код подтверждения', error: 'mail_failed' },
       { status: 500 }
     );
   }
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     if (result.status === 'account_exists') {
       const response: ISendOTPSignUpResponse = {
         success: false,
-        msg: 'Account already exists',
+        msg: 'Аккаунт с таким адресом электронной почты уже существует',
         error: 'account_exists',
       };
 
@@ -86,14 +86,14 @@ export async function POST(request: Request) {
 
     const response: ISendOTPSignUpResponse = {
       success: true,
-      msg: 'OK',
+      msg: 'Успешно',
       data: { otp_guid: result.otpGuid, expires_at: result.expiresAt },
     };
 
     return NextResponse.json<ISendOTPSignUpResponse>(response);
   } catch {
     return NextResponse.json<ISendOTPSignUpResponse>(
-      { success: false, msg: 'Failed to create OTP' },
+      { success: false, msg: 'Не удалось создать код подтверждения' },
       { status: 500 }
     );
   }

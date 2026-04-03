@@ -31,14 +31,14 @@ export async function POST(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IRemoveRecipientFromGroupResponse>(
-      { success: false, msg: 'Unauthorized' },
+      { success: false, msg: 'Требуется авторизация' },
       { status: 401 }
     );
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json<IRemoveRecipientFromGroupResponse>(
-      { success: false, msg: 'Mail API is not configured', error: 'contact_group_remove_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'contact_group_remove_failed' },
       { status: 500 }
     );
   }
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
     if ((rows as Array<unknown>).length === 0) {
       return NextResponse.json<IRemoveRecipientFromGroupResponse>(
-        { success: false, msg: 'Group is not available', error: 'contact_group_access_denied' },
+        { success: false, msg: 'Группа недоступна', error: 'contact_group_access_denied' },
         { status: 403 }
       );
     }
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     return NextResponse.json<IRemoveRecipientFromGroupResponse>(
       {
         success: false,
-        msg: 'Failed to check group access',
+        msg: 'Не удалось проверить доступ к группе',
         error: 'contact_group_remove_failed',
       },
       { status: 500 }
@@ -80,8 +80,8 @@ export async function POST(request: Request) {
       return NextResponse.json<IRemoveRecipientFromGroupResponse>(
         {
           success: false,
-          msg: providerBody?.msg ?? 'Failed to fetch recipient',
-          error: providerBody?.error ?? 'contact_group_remove_failed',
+          msg: 'Не удалось получить данные пользователя',
+          error: 'contact_group_remove_failed',
         },
         { status: 500 }
       );
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       return NextResponse.json<IRemoveRecipientFromGroupResponse>(
         {
           success: false,
-          msg: 'Recipient is not found in group',
+          msg: 'Пользователь не найден в группе',
           error: 'contact_group_remove_failed',
         },
         { status: 404 }
@@ -118,8 +118,8 @@ export async function POST(request: Request) {
         return NextResponse.json<IRemoveRecipientFromGroupResponse>(
           {
             success: false,
-            msg: deleteBody?.msg ?? 'Failed to remove recipient from group',
-            error: deleteBody?.error ?? 'contact_group_remove_failed',
+            msg: 'Не удалось удалить пользователя из группы',
+            error: 'contact_group_remove_failed',
           },
           { status: 500 }
         );
@@ -136,8 +136,8 @@ export async function POST(request: Request) {
         return NextResponse.json<IRemoveRecipientFromGroupResponse>(
           {
             success: false,
-            msg: updateBody?.msg ?? 'Failed to remove recipient from group',
-            error: updateBody?.error ?? 'contact_group_remove_failed',
+            msg: 'Не удалось удалить пользователя из группы',
+            error: 'contact_group_remove_failed',
           },
           { status: 500 }
         );
@@ -148,10 +148,7 @@ export async function POST(request: Request) {
       return NextResponse.json<IRemoveRecipientFromGroupResponse>(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to remove recipient from group',
+          msg: 'Не удалось удалить пользователя из группы',
           error: 'contact_group_remove_failed',
         },
         { status: 500 }
@@ -161,7 +158,7 @@ export async function POST(request: Request) {
     return NextResponse.json<IRemoveRecipientFromGroupResponse>(
       {
         success: false,
-        msg: 'Failed to remove recipient from group',
+        msg: 'Не удалось удалить пользователя из группы',
         error: 'contact_group_remove_failed',
       },
       { status: 500 }
@@ -170,6 +167,6 @@ export async function POST(request: Request) {
 
   return NextResponse.json<IRemoveRecipientFromGroupResponse>({
     success: true,
-    msg: 'OK',
+    msg: 'Успешно',
   });
 }

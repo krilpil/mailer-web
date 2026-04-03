@@ -20,7 +20,10 @@ import {
 import { SignInFormValues, SignInFormProps } from '../../model/signInForm.types';
 
 const validationSchema = yup.object({
-  email: yup.string().email('Введите корректный email').required('Укажите email'),
+  email: yup
+    .string()
+    .email('Введите корректный адрес электронной почты')
+    .required('Укажите адрес электронной почты'),
   password: yup.string().required('Введите пароль'),
 });
 
@@ -58,7 +61,7 @@ export const SignInForm = ({ onSubmit }: SignInFormProps) => {
         <StyledInput
           id="email"
           name="email"
-          placeholder="you@company.com"
+          placeholder="Введите почтовый адрес"
           value={formik.values.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -80,10 +83,6 @@ export const SignInForm = ({ onSubmit }: SignInFormProps) => {
         />
         {passwordError && <FieldError>{passwordError}</FieldError>}
       </Field>
-
-      <RightLinkRow>
-        <InlineLink href="/forgot-password">Забыли пароль?</InlineLink>
-      </RightLinkRow>
 
       {formError && <FormError>{formError}</FormError>}
 

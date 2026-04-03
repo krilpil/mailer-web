@@ -701,16 +701,14 @@ const extractOverview = (value: unknown): IAnalyticsOverviewData | null => {
 
 const formatAxiosError = (prefix: string, error: unknown): string => {
   if (error instanceof AxiosError) {
-    const body = toObject(error.response?.data);
-    const message = toString(body?.msg) || toString(body?.error) || error.message;
-    return `${prefix}: ${message || 'provider request failed'}`;
+    return `${prefix}: ошибка запроса к провайдеру`;
   }
 
   if (error instanceof Error) {
-    return `${prefix}: ${error.message || 'request failed'}`;
+    return `${prefix}: запрос завершился ошибкой`;
   }
 
-  return `${prefix}: request failed`;
+  return `${prefix}: запрос завершился ошибкой`;
 };
 
 const listAllProviderTasks = async (warnings: string[]): Promise<IAnalyticsTask[]> => {
@@ -721,9 +719,7 @@ const listAllProviderTasks = async (warnings: string[]): Promise<IAnalyticsTask[
       const body = (await listBatchMailTasks({ page, page_size: DEFAULT_TASKS_PAGE_SIZE })).data;
 
       if (!body?.success) {
-        warnings.push(
-          `Список задач рассылки (страница ${page}): ${body?.msg || 'provider request failed'}`
-        );
+        warnings.push(`Список задач рассылки (страница ${page}): ошибка запроса к провайдеру`);
         break;
       }
 
@@ -768,7 +764,7 @@ const getProviderDomains = async (
     const body = await providerGet<IProviderResponse<unknown[]>>('/domains/all');
 
     if (!body?.success) {
-      warnings.push(`Данные доменов: ${body?.msg || 'provider request failed'}`);
+      warnings.push('Данные доменов: ошибка запроса к провайдеру');
       return domainMap;
     }
 
@@ -802,7 +798,7 @@ const getProviderMailboxes = async (
     const body = await providerGet<IProviderResponse<unknown[]>>('/mailbox/all', { domain });
 
     if (!body?.success) {
-      throw new Error(`Почтовые ящики домена ${domain}: ${body?.msg || 'provider request failed'}`);
+      throw new Error(`Почтовые ящики домена ${domain}: ошибка запроса к провайдеру`);
     }
 
     const list = Array.isArray(body.data) ? body.data : [];
@@ -843,9 +839,7 @@ const getFailedByDomain = async (
     });
 
     if (!body?.success) {
-      throw new Error(
-        `Ошибки отправки домена ${domain}: ${body?.msg || 'provider request failed'}`
-      );
+      throw new Error(`Ошибки отправки домена ${domain}: ошибка запроса к провайдеру`);
     }
 
     const list = Array.isArray(body.data)
@@ -892,7 +886,7 @@ const getOverviewByDomain = async (
     });
 
     if (!body?.success) {
-      throw new Error(`Сводка домена ${domain}: ${body?.msg || 'provider request failed'}`);
+      throw new Error(`Сводка домена ${domain}: ошибка запроса к провайдеру`);
     }
 
     return {

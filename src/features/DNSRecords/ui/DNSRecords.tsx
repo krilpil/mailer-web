@@ -237,12 +237,24 @@ export const DNSRecords: FC<DNSRecordsProps> = ({ value, isLoadingUpdate, onClos
       width={1000}
       styles={{ body: { maxHeight: '70vh', overflow: 'auto' } }}
     >
-      <Table dataSource={summaryData} columns={summaryColumns} pagination={false} size="small" />
+      <Table
+        dataSource={summaryData}
+        columns={summaryColumns}
+        pagination={false}
+        size="small"
+        scroll={{ x: 780 }}
+      />
 
       <Divider />
 
       <Typography.Title level={4}>Шаг 1: Добавьте A запись</Typography.Title>
-      <Table dataSource={aRecordData} columns={columnsSimple} pagination={false} size="small" />
+      <Table
+        dataSource={aRecordData}
+        columns={columnsSimple}
+        pagination={false}
+        size="small"
+        scroll={{ x: 780 }}
+      />
 
       <Divider />
 
@@ -251,7 +263,13 @@ export const DNSRecords: FC<DNSRecordsProps> = ({ value, isLoadingUpdate, onClos
         Войдите к вашему провайдеру домена и добавьте MX запись для почтового сервиса (пожалуйста,
         скопируйте параметры ниже напрямую)
       </Typography.Paragraph>
-      <Table dataSource={mxRecordData} columns={columnsMx} pagination={false} size="small" />
+      <Table
+        dataSource={mxRecordData}
+        columns={columnsMx}
+        pagination={false}
+        size="small"
+        scroll={{ x: 780 }}
+      />
 
       <Divider />
 
@@ -266,7 +284,13 @@ export const DNSRecords: FC<DNSRecordsProps> = ({ value, isLoadingUpdate, onClos
           <Radio value="1024">1024-битный RSA ключ</Radio>
         </Radio.Group>
       </div>
-      <Table dataSource={txtRecordsData} columns={columnsSimple} pagination={false} size="small" />
+      <Table
+        dataSource={txtRecordsData}
+        columns={columnsSimple}
+        pagination={false}
+        size="small"
+        scroll={{ x: 780 }}
+      />
 
       <Divider />
 

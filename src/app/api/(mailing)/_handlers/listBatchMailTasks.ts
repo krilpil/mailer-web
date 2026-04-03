@@ -2,6 +2,9 @@ import { AxiosError } from 'axios';
 import { NextResponse } from 'next/server';
 import { ValidationError } from 'yup';
 
+import { auth } from '@/auth';
+import { getDataSource } from '@/database/data-source';
+
 import { listBatchMailTasks } from '../_services/listBatchMailTasks';
 import { listBatchMailTasksQueryValidate } from '../batch_mail/task/list/listTasks.validation';
 import {
@@ -14,12 +17,110 @@ import {
 
 const emptyData: IListBatchMailTasksResponse['data'] = { total: 0, list: [] };
 
+interface IMailingOwnership {
+  mailboxUsernames: Set<string>;
+  domains: Set<string>;
+  templateIds: Set<number>;
+  groupIds: Set<number>;
+}
+
 const toNumber = (value: unknown, fallback = 0): number => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
 const toString = (value: unknown): string => (typeof value === 'string' ? value : '');
+
+const toPositiveInteger = (value: unknown): number | null => {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+};
+
+const toLower = (value: unknown): string => {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  return value.trim().toLowerCase();
+};
+
+const extractEmail = (value: unknown): string => {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  const lowerValue = value.trim().toLowerCase();
+  if (!lowerValue) {
+    return '';
+  }
+
+  const emailMatch = lowerValue.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/);
+
+  return emailMatch?.[0] ?? '';
+};
+
+const getDomainFromEmail = (email: string): string => {
+  if (!email) {
+    return '';
+  }
+
+  const delimiterIndex = email.lastIndexOf('@');
+  if (delimiterIndex <= 0 || delimiterIndex >= email.length - 1) {
+    return '';
+  }
+
+  return email.slice(delimiterIndex + 1).toLowerCase();
+};
+
+const hasOwnershipSignals = (ownership: IMailingOwnership): boolean =>
+  ownership.mailboxUsernames.size > 0 ||
+  ownership.domains.size > 0 ||
+  ownership.templateIds.size > 0 ||
+  ownership.groupIds.size > 0;
+
+const readMailingOwnership = async (accountId: string): Promise<IMailingOwnership> => {
+  const dataSource = await getDataSource();
+
+  const [domainRows, mailboxRows, templateRows, groupRows] = await Promise.all([
+    dataSource.query('SELECT domain FROM account_domain WHERE account_id = $1', [accountId]),
+    dataSource.query('SELECT username, domain FROM account_mailbox WHERE account_id = $1', [
+      accountId,
+    ]),
+    dataSource.query('SELECT template_id FROM account_template WHERE account_id = $1', [accountId]),
+    dataSource.query('SELECT group_id FROM account_recipient WHERE account_id = $1', [accountId]),
+  ]);
+
+  const domains = new Set(
+    (domainRows as Array<{ domain?: unknown }>)
+      .map((row) => toLower(row.domain))
+      .filter((domain) => !!domain)
+  );
+
+  const mailboxUsernames = new Set(
+    (mailboxRows as Array<{ username?: unknown; domain?: unknown }>)
+      .flatMap((row) => [toLower(row.username), toLower(row.domain)])
+      .filter((value) => !!value)
+  );
+
+  const templateIds = new Set(
+    (templateRows as Array<{ template_id?: unknown }>)
+      .map((row) => toPositiveInteger(row.template_id))
+      .filter((value): value is number => value !== null)
+  );
+
+  const groupIds = new Set(
+    (groupRows as Array<{ group_id?: unknown }>)
+      .map((row) => toPositiveInteger(row.group_id))
+      .filter((value): value is number => value !== null)
+  );
+
+  return {
+    mailboxUsernames,
+    domains,
+    templateIds,
+    groupIds,
+  };
+};
 
 const normalizeTag = (value: unknown): IBatchMailTagInfo | null => {
   if (!value || typeof value !== 'object') {
@@ -116,6 +217,37 @@ const normalizeTask = (value: unknown): IBatchMailTask | null => {
   };
 };
 
+const isOwnedTask = (task: IBatchMailTask, ownership: IMailingOwnership): boolean => {
+  if (ownership.templateIds.has(task.template_id)) {
+    return true;
+  }
+
+  if (ownership.groupIds.has(task.group_id)) {
+    return true;
+  }
+
+  if (task.groups?.id && ownership.groupIds.has(task.groups.id)) {
+    return true;
+  }
+
+  const addresserEmail = extractEmail(task.addresser);
+  const addresserDomain = getDomainFromEmail(addresserEmail);
+
+  if (addresserEmail && ownership.mailboxUsernames.has(addresserEmail)) {
+    return true;
+  }
+
+  if (addresserDomain && ownership.domains.has(addresserDomain)) {
+    return true;
+  }
+
+  if (addresserDomain && ownership.mailboxUsernames.has(addresserDomain)) {
+    return true;
+  }
+
+  return false;
+};
+
 const buildErrorResponse = (
   msg: string,
   status = 500,
@@ -156,14 +288,21 @@ const parseQuery = async (
     return { data };
   } catch (error) {
     if (error instanceof ValidationError) {
-      const message = error.errors.length ? error.errors.join(', ') : 'Validation error';
       return {
-        error: buildErrorResponse(message, 400, 'batch_mail_task_list_invalid_query'),
+        error: buildErrorResponse(
+          'Некорректные параметры запроса',
+          400,
+          'batch_mail_task_list_invalid_query'
+        ),
       };
     }
 
     return {
-      error: buildErrorResponse('Validation error', 400, 'batch_mail_task_list_invalid_query'),
+      error: buildErrorResponse(
+        'Некорректные параметры запроса',
+        400,
+        'batch_mail_task_list_invalid_query'
+      ),
     };
   }
 };
@@ -175,41 +314,103 @@ export async function GET(request: Request) {
     return queryResult.error;
   }
 
-  if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
-    return buildErrorResponse('Mail API is not configured');
+  const session = await auth();
+  const accountId = session?.user?.id;
+  if (!accountId) {
+    return buildErrorResponse('Требуется авторизация', 401, 'batch_mail_task_access_denied');
   }
 
-  try {
-    const providerBody = (await listBatchMailTasks(queryResult.data)).data;
-    const providerCode =
-      typeof providerBody?.code === 'number' && Number.isFinite(providerBody.code)
-        ? providerBody.code
-        : undefined;
+  if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
+    return buildErrorResponse('Почтовый API не настроен');
+  }
 
-    if (!providerBody?.success) {
-      return buildErrorResponse(
-        providerBody?.msg ?? 'Failed to fetch task list',
-        500,
-        providerBody?.error ?? 'batch_mail_task_list_failed',
-        providerCode
-      );
+  let ownership: IMailingOwnership;
+
+  try {
+    ownership = await readMailingOwnership(accountId);
+  } catch {
+    return buildErrorResponse(
+      'Не удалось получить данные аккаунта',
+      500,
+      'batch_mail_task_list_failed'
+    );
+  }
+
+  if (!hasOwnershipSignals(ownership)) {
+    return NextResponse.json<IListBatchMailTasksResponse>({
+      success: true,
+      msg: 'Успешно',
+      data: emptyData,
+    });
+  }
+
+  const providerPageSize = Math.max(queryResult.data.page_size, 100);
+
+  try {
+    const ownedTasks: IBatchMailTask[] = [];
+    let providerCode: number | undefined;
+    let providerPage = 1;
+    let providerTotalPages = 1;
+
+    while (providerPage <= providerTotalPages) {
+      const providerBody = (
+        await listBatchMailTasks({
+          ...queryResult.data,
+          page: providerPage,
+          page_size: providerPageSize,
+        })
+      ).data;
+
+      const currentProviderCode =
+        typeof providerBody?.code === 'number' && Number.isFinite(providerBody.code)
+          ? providerBody.code
+          : undefined;
+
+      if (typeof providerCode === 'undefined') {
+        providerCode = currentProviderCode;
+      }
+
+      if (!providerBody?.success) {
+        return buildErrorResponse(
+          'Не удалось получить список задач',
+          500,
+          'batch_mail_task_list_failed',
+          currentProviderCode
+        );
+      }
+
+      const providerList = Array.isArray(providerBody.data?.list)
+        ? providerBody.data.list
+            .map((item) => normalizeTask(item))
+            .filter((item): item is IBatchMailTask => item !== null)
+        : [];
+
+      ownedTasks.push(...providerList.filter((task) => isOwnedTask(task, ownership)));
+
+      const providerTotal = toNumber(providerBody.data?.total, 0);
+
+      if (providerTotal > 0) {
+        providerTotalPages = Math.max(1, Math.ceil(providerTotal / providerPageSize));
+      } else if (providerList.length < providerPageSize) {
+        break;
+      } else {
+        providerTotalPages = providerPage + 1;
+      }
+
+      providerPage += 1;
     }
 
-    const list = Array.isArray(providerBody.data?.list)
-      ? providerBody.data.list
-          .map((item) => normalizeTask(item))
-          .filter((item): item is IBatchMailTask => item !== null)
-      : [];
-
-    const total = toNumber(providerBody.data?.total, list.length);
+    const offset = (queryResult.data.page - 1) * queryResult.data.page_size;
+    const pagedList = ownedTasks.slice(offset, offset + queryResult.data.page_size);
+    const total = ownedTasks.length;
 
     return NextResponse.json<IListBatchMailTasksResponse>({
       success: true,
-      msg: providerBody.msg ?? 'OK',
+      msg: 'Успешно',
       code: providerCode,
       data: {
         total,
-        list,
+        list: pagedList,
       },
     });
   } catch (error) {
@@ -220,13 +421,13 @@ export async function GET(request: Request) {
           : undefined;
 
       return buildErrorResponse(
-        providerError?.error ?? providerError?.msg ?? 'Failed to fetch task list',
+        'Не удалось получить список задач',
         500,
-        providerError?.error ?? 'batch_mail_task_list_failed',
+        'batch_mail_task_list_failed',
         providerError?.code
       );
     }
 
-    return buildErrorResponse('Failed to fetch task list');
+    return buildErrorResponse('Не удалось получить список задач');
   }
 }

@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
     if (result.status === 'otp_not_found') {
       return NextResponse.json<IVerifyOTPSignUpResponse>(
-        { success: false, msg: 'OTP not found' },
+        { success: false, msg: 'Код подтверждения не найден или истек' },
         { status: 404 }
       );
     }
@@ -66,12 +66,12 @@ export async function POST(request: Request) {
     const secret = getAuthSecret();
     if (!secret) {
       return NextResponse.json<IVerifyOTPSignUpResponse>(
-        { success: false, msg: 'Auth secret is not configured' },
+        { success: false, msg: 'Сервис авторизации не настроен' },
         { status: 500 }
       );
     }
 
-    const response: IVerifyOTPSignUpResponse = { success: true, msg: 'OK' };
+    const response: IVerifyOTPSignUpResponse = { success: true, msg: 'Успешно' };
     const nextResponse = NextResponse.json<IVerifyOTPSignUpResponse>(response);
     const token = await buildSessionToken(result.userId, parsed.email, SESSION_COOKIE_NAME);
     const secureToken = await buildSessionToken(
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     return nextResponse;
   } catch {
     return NextResponse.json<IVerifyOTPSignUpResponse>(
-      { success: false, msg: 'Failed to verify OTP' },
+      { success: false, msg: 'Не удалось подтвердить код' },
       { status: 500 }
     );
   }

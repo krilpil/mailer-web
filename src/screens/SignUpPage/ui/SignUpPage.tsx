@@ -9,12 +9,23 @@ import { useSendOTPSignUp, useSubmitOTPSignUp } from '@/entities/auth/api';
 
 import {
   SPage,
+  SContainer,
+  SHero,
+  SFeatureList,
+  SFeatureItem,
+  SQuote,
+  SFormColumn,
   SCard,
   SBrand,
   SBrandName,
+  SBrandBadge,
   STitle,
   SSubtitle,
+  SCardTop,
+  SCardTitle,
+  SCardDescription,
   SFormSection,
+  SFootnote,
 } from './SignUpPage.styles';
 
 type SignUpState = {
@@ -138,30 +149,61 @@ export const SignUpPage = () => {
 
   return (
     <SPage>
-      <SBrand>
-        <SBrandName>MAILFINCH</SBrandName>
-      </SBrand>
+      <SContainer>
+        <SHero>
+          <SBrand>
+            <SBrandName>MAILFINCH</SBrandName>
+            <SBrandBadge>Launch Faster</SBrandBadge>
+          </SBrand>
 
-      <STitle>Создать аккаунт</STitle>
-      <SSubtitle>Пройдите регистрацию, чтобы начать работу</SSubtitle>
+          <STitle>Создайте аккаунт и запустите первую рассылку уже сегодня</STitle>
+          <SSubtitle>
+            Мы собрали работу с доменами, ящиками, шаблонами и аудиторией в один продуманный
+            интерфейс. Без перегруза и сложных настроек на старте.
+          </SSubtitle>
 
-      <SCard>
-        <SFormSection>
-          {formSignUp.stage === 'signUp' && (
-            <SignUpForm onSubmitAction={handleSignUp} error={signUpError ?? undefined} />
-          )}
+          <SFeatureList>
+            <SFeatureItem>Быстрая регистрация и подтверждение по коду</SFeatureItem>
+            <SFeatureItem>Единая панель для всей email-инфраструктуры</SFeatureItem>
+            <SFeatureItem>Готово к масштабированию и аналитике отправок</SFeatureItem>
+          </SFeatureList>
 
-          {formSignUp.stage === 'confirmation' && (
-            <ConfirmationForm
-              expiresAt={formSignUp.data.expiresAt}
-              email={formSignUp.data.email}
-              onSubmitAction={handleConfirm}
-              onRepeatOTP={handleRepeatOTP}
-              error={confirmError ?? undefined}
-            />
-          )}
-        </SFormSection>
-      </SCard>
+          <SQuote>
+            После регистрации вы сразу получаете доступ к рабочему окружению, где каждая функция
+            находится на своем месте.
+          </SQuote>
+        </SHero>
+
+        <SFormColumn>
+          <SCard>
+            <SCardTop>
+              <SCardTitle>Регистрация в Mailfinch</SCardTitle>
+              <SCardDescription>
+                Укажите email и пароль, затем подтвердите код из письма. Это займет меньше минуты.
+              </SCardDescription>
+            </SCardTop>
+
+            <SFormSection>
+              {formSignUp.stage === 'signUp' && (
+                <SignUpForm onSubmitAction={handleSignUp} error={signUpError ?? undefined} />
+              )}
+
+              {formSignUp.stage === 'confirmation' && (
+                <ConfirmationForm
+                  expiresAt={formSignUp.data.expiresAt}
+                  email={formSignUp.data.email}
+                  onSubmitAction={handleConfirm}
+                  onRepeatOTP={handleRepeatOTP}
+                  error={confirmError ?? undefined}
+                />
+              )}
+            </SFormSection>
+            <SFootnote>
+              Создавая аккаунт, вы принимаете правила безопасного использования платформы.
+            </SFootnote>
+          </SCard>
+        </SFormColumn>
+      </SContainer>
     </SPage>
   );
 };

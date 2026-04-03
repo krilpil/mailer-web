@@ -21,6 +21,7 @@ export const SettingMailboxes = () => {
       dataSource={tableDataSource}
       pagination={false}
       loading={mailboxesList.isFetching}
+      scroll={{ x: 720 }}
     />
   );
 };

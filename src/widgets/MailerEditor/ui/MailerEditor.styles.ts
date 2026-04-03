@@ -7,8 +7,13 @@ export const SMailerEditor = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
-  padding: 0 36px;
-  width: 728px;
+  width: min(100%, 860px);
+  padding-inline: clamp(0px, 2vw, 20px);
+
+  @media (max-width: 768px) {
+    gap: 20px;
+    padding-inline: 0;
+  }
 `;
 
 export const SHeading = styled(Input.TextArea).attrs({
@@ -21,12 +26,12 @@ export const SHeading = styled(Input.TextArea).attrs({
   },
 })`
   &.ant-input {
-    font-family: var(--font-play);
+    font-family: var(--font-roboto);
     font-weight: 700;
     color: #3b3b3b;
     min-height: unset;
     padding: 0;
-    font-size: 32px;
+    font-size: clamp(24px, 4vw, 34px);
     border-radius: 0;
     overflow: auto;
     -ms-overflow-style: none;
@@ -44,7 +49,7 @@ export const SEditorContent = styled(EditorContent)`
     grid-gap: 20px;
     outline: none;
     color: #3b3b3b;
-    padding-bottom: 300px;
+    padding-bottom: 180px;
 
     white-space: normal;
     overflow-wrap: anywhere;
@@ -52,12 +57,12 @@ export const SEditorContent = styled(EditorContent)`
     hyphens: auto;
 
     h2 {
-      font-size: 24px;
+      font-size: clamp(22px, 3vw, 26px);
       font-weight: 600;
     }
 
     h3 {
-      font-size: 20px;
+      font-size: clamp(18px, 2.8vw, 22px);
       font-weight: 600;
     }
 

@@ -55,14 +55,21 @@ const parseQuery = async (
     return { data };
   } catch (error) {
     if (error instanceof ValidationError) {
-      const message = error.errors.length ? error.errors.join(', ') : 'Validation error';
       return {
-        error: buildErrorResponse(message, 400, 'domains_analytics_invalid_query'),
+        error: buildErrorResponse(
+          'Некорректные параметры запроса',
+          400,
+          'domains_analytics_invalid_query'
+        ),
       };
     }
 
     return {
-      error: buildErrorResponse('Validation error', 400, 'domains_analytics_invalid_query'),
+      error: buildErrorResponse(
+        'Некорректные параметры запроса',
+        400,
+        'domains_analytics_invalid_query'
+      ),
     };
   }
 };
@@ -78,19 +85,15 @@ export async function GET(request: Request) {
   const accountId = session?.user?.id;
 
   if (!accountId) {
-    return buildErrorResponse('Unauthorized', 401, 'unauthorized');
+    return buildErrorResponse('Требуется авторизация', 401, 'unauthorized');
   }
 
   if (queryResult.data.account_id && queryResult.data.account_id !== accountId) {
-    return buildErrorResponse(
-      'Access denied for requested account_id',
-      403,
-      'account_access_denied'
-    );
+    return buildErrorResponse('Доступ к данным запрещен', 403, 'account_access_denied');
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
-    return buildErrorResponse('Mail API is not configured');
+    return buildErrorResponse('Почтовый API не настроен');
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -121,14 +124,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json<IGetDomainsAnalyticsResponse>({
       success: true,
-      msg: data.warnings.length ? 'Часть аналитики недоступна' : 'OK',
+      msg: data.warnings.length ? 'Часть аналитики недоступна' : 'Успешно',
       data,
     });
   } catch (error) {
-    if (error instanceof Error) {
-      return buildErrorResponse(error.message || 'Failed to build domain analytics');
-    }
-
-    return buildErrorResponse('Failed to build domain analytics');
+    void error;
+    return buildErrorResponse('Не удалось сформировать аналитику по доменам');
   }
 }

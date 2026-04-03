@@ -226,6 +226,7 @@ export const SettingContacts = () => {
         dataSource={groupsDataSource}
         pagination={false}
         loading={groupsList.isFetching}
+        scroll={{ x: 960 }}
       />
 
       <Modal
@@ -241,9 +242,9 @@ export const SettingContacts = () => {
             rows={4}
             value={recipientsInput}
             onChange={(event) => setRecipientsInput(event.target.value)}
-            placeholder={`one@example.com
-two@example.com
-three@example.com`}
+            placeholder={`адрес1@домен.рф
+адрес2@домен.рф
+адрес3@домен.рф`}
           />
           <Typography.Text strong>Импорт из файла</Typography.Text>
           <RecipientsImportFileInput
@@ -276,6 +277,7 @@ three@example.com`}
           dataSource={recipientsDataSource}
           pagination={{ pageSize: 10 }}
           loading={groupContacts.isFetching}
+          scroll={{ x: 860 }}
         />
       </Modal>
     </>

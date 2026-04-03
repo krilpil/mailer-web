@@ -14,26 +14,23 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: 'title',
-  description: 'description',
+  title: {
+    default: 'Mailfinch',
+    template: '%s | Mailfinch',
+  },
+  description: 'Панель управления почтовым сервисом Mailfinch',
   robots: {
     index: true,
     notranslate: true,
   },
-  // icons: {
-  //   icon: [
-  //     {
-  //       media: '(prefers-color-scheme: light)',
-  //       url: '/favicon-light.ico',
-  //       href: '/favicon-light.ico',
-  //     },
-  //     {
-  //       media: '(prefers-color-scheme: dark)',
-  //       url: '/favicon-dark.ico',
-  //       href: '/favicon-dark.ico',
-  //     },
-  //   ],
-  // },
+  icons: {
+    icon: [
+      {
+        url: '/favicon.png',
+        href: '/favicon.png',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {

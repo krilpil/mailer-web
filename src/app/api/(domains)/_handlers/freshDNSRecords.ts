@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: false,
-        msg: 'Mail API is not configured',
+        msg: 'Почтовый API не настроен',
         error: 'dns_records_refresh_failed',
       },
       { status: 500 }
@@ -41,8 +41,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: body?.msg ?? 'Failed to refresh DNS records',
-          error: body?.error ?? 'dns_records_refresh_failed',
+          msg: 'Не удалось обновить DNS-записи',
+          error: 'dns_records_refresh_failed',
         },
         { status: 500 }
       );
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     const response: IFreshDNSRecordsResponse = {
       success: true,
-      msg: body?.msg ?? 'OK',
+      msg: 'Успешно',
       data: body.data,
     };
 
@@ -60,10 +60,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to refresh DNS records',
+          msg: 'Не удалось обновить DNS-записи',
           error: 'dns_records_refresh_failed',
         },
         { status: 500 }
@@ -73,7 +70,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: false,
-        msg: 'Failed to refresh DNS records',
+        msg: 'Не удалось обновить DNS-записи',
         error: 'dns_records_refresh_failed',
       },
       { status: 500 }

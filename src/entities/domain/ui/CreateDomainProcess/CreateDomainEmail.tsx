@@ -42,7 +42,7 @@ export const CreateDomainEmail: FC<CreateDomainEmailProps> = ({ domain, onSubmit
             value={values.localPart}
             onChange={handleChange}
             onBlur={handleBlur}
-            placeholder="example"
+            placeholder="otdel"
           />
           <Space.Addon>@{domain}</Space.Addon>
         </Space.Compact>

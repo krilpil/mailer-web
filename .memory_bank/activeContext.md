@@ -2,6 +2,13 @@
 
 ## Current Focus
 
+- UI-редизайн auth-экранов `/sign-in` и `/sign-up`: усилить first impression через hero-композицию, более сильную визуальную иерархию и адаптивный onboarding-блок.
+- Базовая адаптивность всего приложения: единый responsive-shell (desktop sidebar + mobile drawer), адаптивные отступы и стабильное поведение таблиц на узких экранах.
+- Визуальная полировка интерфейса: обновление темы Ant Design, глобальных стилей и консистентного визуального языка header/sidebar/forms.
+- Обновление навигации: перевести `SideMenu` на Ant Design, добавить иконки разделов и sticky-поведение при скролле.
+- Регистрация: валидация минимальной длины пароля (не менее 6 символов) на клиенте и сервере.
+- Ограничение доступа к `/mailings`: в списке должны отображаться только задачи текущего аккаунта.
+- SEO/UX-актуализация метаданных: добавить `metadata.title` для всех страниц App Router.
 - Стабильность прод-сборки `/analytics`: устранение строгих TS-конфликтов `Dayjs` в `RangePicker` (`SettingAnalytics`).
 - Страница `/analytics`: account-scoped аналитика по доменам и mailbox отправителей (summary, top, таблицы, timeline).
 - Endpoint'ы `GET /api/analytics/domains` и `GET /api/analytics/mailboxes` с фильтрацией только по данным текущего `account_id`.
@@ -25,6 +32,23 @@
 
 ## Recent Changes
 
+- Редизайн `SignInPage` и `SignUpPage`: внедрен двухколоночный hero-layout (value block + form card), добавлены выразительные заголовки, бейджи бренда, список преимуществ и trust-message.
+- Для auth-страниц усилена визуальная подача: мягкие фоновые градиенты с динамикой, улучшенная карточка формы (glassmorphism, тень, radius) и адаптивный fallback для мобильных.
+- Проверка после редизайна auth: `yarn exec tsc --noEmit` проходит без ошибок.
+- Реализован responsive shell в `PrivateLayout`: desktop `SideMenu` вынесен в фиксированный `SSidebar`, для мобильных добавлен `Drawer` с авто-закрытием при смене маршрута.
+- Обновлены `Header` и `SideMenu`: единый бренд-блок, иконки разделов, mobile-trigger меню, улучшенные состояния и визуальная иерархия.
+- Добавлены базовые правила адаптивности для контента и таблиц (`scroll.x`, `min(100%, ...)`, wrap/overflow) на ключевых страницах (`/mailings`, `/settings`, `/mailboxes`, `/templates`, `/contacts`, DNS modal).
+- Обновлены глобальные стили и тема Ant Design (`GlobalStyle`, `themeConfig`): аккуратные фоны, типографика, радиусы, hover/selected состояния компонентов.
+- Проверка корректности правок: `yarn exec tsc --noEmit` проходит без ошибок.
+- `SideMenu` переведен на `antd Menu`: добавлены иконки для всех разделов и кнопка `Выйти` на базе `antd Button`.
+- Для `SideMenu` добавлено sticky-поведение (`position: sticky`, `top: 0`, `height: 100vh`, внутренний `overflow-y: auto`), меню фиксируется при прокрутке контента.
+- В регистрации добавлено правило минимальной длины пароля `>= 6`: `SignUpForm` (client validation) и `POST /api/sign-up` (server validation).
+- В `GET /api/batch_mail/task/list` добавлена авторизация и ownership-фильтрация задач по данным аккаунта (`account_template`, `account_recipient`, `account_mailbox`, `account_domain`).
+- Для `GET /api/batch_mail/task/list` включена локальная пагинация после фильтрации: в UI `/mailings` возвращаются только задачи текущего пользователя.
+- Обновлены `docs/API.md`, `README.md` и `.memory_bank/modules/mailing.md` под новое правило доступа к списку рассылок.
+- Для всех UI-страниц в `src/app` добавлены `metadata.title`: `/`, `/sign-in`, `/sign-up`, `/settings`, `/mailboxes`, `/mailing`, `/mailings`, `/templates`, `/contacts`.
+- В `src/app/layout.tsx` общий `metadata.title` переведен в формат `default + template` (`%s | Mailfinch`) для единообразных заголовков вкладки.
+- После правок title повторно подтверждено, что `yarn build:prod` проходит успешно.
 - Исправлен блокирующий TypeScript-конфликт в `SettingAnalytics`: диапазон дат переведен с `Dayjs`-state на Unix-state (`[start_time, end_time]`), чтобы убрать несовместимость типов `Dayjs` между `RangePicker` и локальными плагинами `dayjs`.
 - Для `RangePicker` добавлено вычисляемое значение `rangePickerValue` из Unix-state; отображение периода и `periodPayload` теперь строятся детерминированно через Unix-метки.
 - Повторная проверка подтвердила, что `yarn build:prod` проходит успешно после фикса (`compile + TypeScript + static generation`).

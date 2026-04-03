@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
-    return buildErrorResponse('Mail API is not configured');
+    return buildErrorResponse('Почтовый API не настроен');
   }
 
   const parsedPayload = parsedResult.data;
@@ -81,8 +81,8 @@ export async function POST(request: Request) {
 
     if (!providerBody?.success) {
       return buildErrorResponse(
-        providerBody?.msg ?? 'Failed to create task',
-        providerBody?.error ?? 'batch_mail_task_create_failed',
+        'Не удалось создать задачу',
+        'batch_mail_task_create_failed',
         providerCode
       );
     }
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     const taskId = toPositiveInteger(providerBody.data?.id);
     if (!taskId) {
       return buildErrorResponse(
-        'Task id was not returned',
+        'Сервис не вернул идентификатор задачи',
         'batch_mail_task_create_failed',
         providerCode
       );
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json<ICreateBatchMailTaskResponse>({
       success: true,
-      msg: providerBody.msg ?? 'OK',
+      msg: 'Успешно',
       code: providerCode,
       data: {
         id: taskId,
@@ -107,15 +107,14 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof AxiosError) {
       const providerError = toProviderErrorPayload(error);
-      const message = providerError?.error ?? providerError?.msg ?? 'Failed to create task';
 
       return buildErrorResponse(
-        message,
-        providerError?.error ?? 'batch_mail_task_create_failed',
+        'Не удалось создать задачу',
+        'batch_mail_task_create_failed',
         toProviderCode(providerError?.code)
       );
     }
 
-    return buildErrorResponse('Failed to create task');
+    return buildErrorResponse('Не удалось создать задачу');
   }
 }

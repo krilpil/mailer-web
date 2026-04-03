@@ -76,13 +76,13 @@ export const SignUpOtpEmail = ({ otpCode }: SignUpOtpEmailProps) => {
   return (
     <Html>
       <Head />
-      <Preview>Используйте этот OTP-код для подтверждения своей электронной почты.</Preview>
+      <Preview>Используйте этот код подтверждения для подтверждения электронной почты.</Preview>
       <Body style={mainStyle}>
         <Container style={containerStyle}>
           <Heading style={headingStyle}>Подтвердите свой адрес электронной почты</Heading>
           <Text style={textStyle}>
-            Используйте OTP-код, указанный ниже, чтобы завершить регистрацию. Этот код действителен
-            в течение 5 минут.
+            Используйте код подтверждения ниже, чтобы завершить регистрацию. Этот код действует в
+            течение 5 минут.
           </Text>
           <Section style={codeContainerStyle}>
             <Text style={codeStyle}>{otpCode}</Text>

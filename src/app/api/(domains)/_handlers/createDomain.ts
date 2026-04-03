@@ -30,11 +30,14 @@ export async function POST(request: Request) {
   const session = await auth();
   const accountId = session?.user?.id;
   if (!accountId) {
-    return NextResponse.json({ success: false, msg: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ success: false, msg: 'Требуется авторизация' }, { status: 401 });
   }
 
   if (parsed.local_part.includes('@')) {
-    return NextResponse.json({ success: false, msg: 'Invalid local part' }, { status: 400 });
+    return NextResponse.json(
+      { success: false, msg: 'Некорректная часть адреса до символа @' },
+      { status: 400 }
+    );
   }
 
   const email = `${parsed.local_part}@${parsed.domain}`;
@@ -49,19 +52,19 @@ export async function POST(request: Request) {
       otpCode: parsed.otp,
     });
   } catch {
-    return NextResponse.json(
-      { success: false, msg: 'Failed to verify OTP' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, msg: 'Не удалось подтвердить код' }, { status: 500 });
   }
 
   if (otpResult.status === 'otp_not_found') {
-    return NextResponse.json({ success: false, msg: 'OTP not found' }, { status: 404 });
+    return NextResponse.json(
+      { success: false, msg: 'Код подтверждения не найден или истек' },
+      { status: 404 }
+    );
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json(
-      { success: false, msg: 'Mail API is not configured', error: 'domain_create_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'domain_create_failed' },
       { status: 500 }
     );
   }
@@ -78,8 +81,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: domainBody?.msg ?? 'Failed to create domain',
-          error: domainBody?.error ?? 'domain_create_failed',
+          msg: 'Не удалось создать домен',
+          error: 'domain_create_failed',
         },
         { status: 500 }
       );
@@ -97,7 +100,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: 'Failed to save domain',
+          msg: 'Не удалось сохранить домен',
           error: 'account_domain_create_failed',
         },
         { status: 500 }
@@ -108,10 +111,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to create domain',
+          msg: 'Не удалось создать домен',
           error: 'domain_create_failed',
         },
         { status: 500 }
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: false, msg: 'Failed to create domain', error: 'domain_create_failed' },
+      { success: false, msg: 'Не удалось создать домен', error: 'domain_create_failed' },
       { status: 500 }
     );
   }
@@ -134,8 +134,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: listBody?.msg ?? 'Failed to fetch mailboxes',
-          error: listBody?.error ?? 'mailbox_list_failed',
+          msg: 'Не удалось получить список почтовых ящиков',
+          error: 'mailbox_list_failed',
         },
         { status: 500 }
       );
@@ -149,10 +149,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to fetch mailboxes',
+          msg: 'Не удалось получить список почтовых ящиков',
           error: 'mailbox_list_failed',
         },
         { status: 500 }
@@ -160,7 +157,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: false, msg: 'Failed to fetch mailboxes', error: 'mailbox_list_failed' },
+      {
+        success: false,
+        msg: 'Не удалось получить список почтовых ящиков',
+        error: 'mailbox_list_failed',
+      },
       { status: 500 }
     );
   }
@@ -174,8 +175,8 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             success: false,
-            msg: deleteBody?.msg ?? 'Failed to delete mailboxes',
-            error: deleteBody?.error ?? 'mailbox_delete_failed',
+            msg: 'Не удалось удалить почтовые ящики',
+            error: 'mailbox_delete_failed',
           },
           { status: 500 }
         );
@@ -185,10 +186,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             success: false,
-            msg:
-              error.response?.data?.error ??
-              error.response?.data?.msg ??
-              'Failed to delete mailboxes',
+            msg: 'Не удалось удалить почтовые ящики',
             error: 'mailbox_delete_failed',
           },
           { status: 500 }
@@ -196,7 +194,11 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(
-        { success: false, msg: 'Failed to delete mailboxes', error: 'mailbox_delete_failed' },
+        {
+          success: false,
+          msg: 'Не удалось удалить почтовые ящики',
+          error: 'mailbox_delete_failed',
+        },
         { status: 500 }
       );
     }
@@ -218,8 +220,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: mailboxBody?.msg ?? 'Failed to create mailbox',
-          error: mailboxBody?.error ?? 'mailbox_create_failed',
+          msg: 'Не удалось создать почтовый ящик',
+          error: 'mailbox_create_failed',
         },
         { status: 500 }
       );
@@ -237,7 +239,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: 'Failed to save mailbox',
+          msg: 'Не удалось сохранить почтовый ящик',
           error: 'account_mailbox_create_failed',
         },
         { status: 500 }
@@ -248,10 +250,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to create mailbox',
+          msg: 'Не удалось создать почтовый ящик',
           error: 'mailbox_create_failed',
         },
         { status: 500 }
@@ -259,7 +258,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: false, msg: 'Failed to create mailbox', error: 'mailbox_create_failed' },
+      { success: false, msg: 'Не удалось создать почтовый ящик', error: 'mailbox_create_failed' },
       { status: 500 }
     );
   }

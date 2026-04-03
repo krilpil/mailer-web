@@ -7,7 +7,7 @@ import { ISendMailPayload, ISendMailResponse } from '../mailing/sendMail/sendMai
 
 const buildErrorResponse = (msg?: string) =>
   NextResponse.json<ISendMailResponse>(
-    { msg: msg ?? 'Failed to send email', success: false },
+    { msg: msg ?? 'Не удалось отправить письмо', success: false },
     { status: 500 }
   );
 
@@ -21,16 +21,16 @@ export async function POST(request: Request) {
       const body = response.data;
 
       if (!body.success) {
-        return buildErrorResponse(body.msg);
+        return buildErrorResponse();
       }
 
-      return NextResponse.json<ISendMailResponse>({ msg: body.msg, success: body.success });
+      return NextResponse.json<ISendMailResponse>({ msg: 'Успешно', success: body.success });
     })
     .catch((error) => {
       if (error instanceof AxiosError) {
-        return buildErrorResponse(error.response?.data.error);
+        return buildErrorResponse();
       }
 
-      return buildErrorResponse('An unhandled error');
+      return buildErrorResponse('Необработанная ошибка');
     });
 }

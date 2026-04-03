@@ -56,14 +56,14 @@ export async function POST(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IImportContactsResponse>(
-      { success: false, msg: 'Unauthorized' },
+      { success: false, msg: 'Требуется авторизация' },
       { status: 401 }
     );
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json<IImportContactsResponse>(
-      { success: false, msg: 'Mail API is not configured', error: 'contact_group_import_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'contact_group_import_failed' },
       { status: 500 }
     );
   }
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     return NextResponse.json<IImportContactsResponse>(
       {
         success: false,
-        msg: 'Recipients list is empty',
+        msg: 'Список пользователей пуст',
         error: 'contact_group_import_failed',
       },
       { status: 400 }
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       return NextResponse.json<IImportContactsResponse>(
         {
           success: false,
-          msg: 'Some groups are not available',
+          msg: 'Некоторые группы недоступны',
           error: 'contact_group_access_denied',
         },
         { status: 403 }
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
     return NextResponse.json<IImportContactsResponse>(
       {
         success: false,
-        msg: 'Failed to check group access',
+        msg: 'Не удалось проверить доступ к группам',
         error: 'contact_group_import_failed',
       },
       { status: 500 }
@@ -189,7 +189,7 @@ export async function POST(request: Request) {
             if (retryBody?.success) {
               return NextResponse.json<IImportContactsResponse>({
                 success: true,
-                msg: 'OK',
+                msg: 'Успешно',
                 data: {
                   imported_count:
                     typeof retryBody.data?.imported_count === 'number'
@@ -207,8 +207,8 @@ export async function POST(request: Request) {
       return NextResponse.json<IImportContactsResponse>(
         {
           success: false,
-          msg: providerBody?.msg ?? 'Failed to import contacts',
-          error: providerBody?.error ?? 'contact_group_import_failed',
+          msg: 'Не удалось импортировать пользователей',
+          error: 'contact_group_import_failed',
         },
         { status: 500 }
       );
@@ -216,7 +216,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json<IImportContactsResponse>({
       success: true,
-      msg: 'OK',
+      msg: 'Успешно',
       data: {
         imported_count:
           typeof providerBody.data?.imported_count === 'number'
@@ -231,8 +231,7 @@ export async function POST(request: Request) {
       return NextResponse.json<IImportContactsResponse>(
         {
           success: false,
-          msg:
-            error.response?.data?.error ?? error.response?.data?.msg ?? 'Failed to import contacts',
+          msg: 'Не удалось импортировать пользователей',
           error: 'contact_group_import_failed',
         },
         { status: 500 }
@@ -240,7 +239,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json<IImportContactsResponse>(
-      { success: false, msg: 'Failed to import contacts', error: 'contact_group_import_failed' },
+      {
+        success: false,
+        msg: 'Не удалось импортировать пользователей',
+        error: 'contact_group_import_failed',
+      },
       { status: 500 }
     );
   }

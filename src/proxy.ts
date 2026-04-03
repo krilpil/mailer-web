@@ -13,7 +13,7 @@ export const proxy = auth((request) => {
     }
 
     if (!request.auth?.user) {
-      return NextResponse.json({ success: false, msg: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ success: false, msg: 'Требуется авторизация' }, { status: 401 });
     }
 
     return NextResponse.next();
@@ -31,5 +31,5 @@ export const proxy = auth((request) => {
 });
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.png).*)'],
 };

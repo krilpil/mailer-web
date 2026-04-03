@@ -157,7 +157,7 @@ Example: `src/app/api/(auth)/sign-up/otp/route.ts` → `POST /api/sign-up/otp`.
 
 - Query: `{ page, page_size, keyword?, status? }`
 - Response: `{ success, msg, code?, data }` where `data` contains `{ total, list }` and normalized task objects.
-- Notes: query validates required paging params and proxies BillionMail `/batch_mail/task/list` with normalized fields for stable client contract.
+- Notes: endpoint requires auth and returns only tasks доступные текущему пользователю; ownership определяется по связям аккаунта (`account_template.template_id`, `account_recipient.group_id`, `account_mailbox.username`, `account_domain.domain`) и полям задачи (`template_id`, `group_id`, `groups.id`, `addresser` email/domain). После фильтрации сервер применяет локальную пагинацию и возвращает только разрешённые задачи.
 
 `GET /api/batch_mail/task/analytics`
 

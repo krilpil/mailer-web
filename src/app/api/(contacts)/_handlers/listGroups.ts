@@ -13,7 +13,7 @@ export async function GET() {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IListGroupsResponse>(
-      { success: false, msg: 'Unauthorized', data: emptyData },
+      { success: false, msg: 'Требуется авторизация', data: emptyData },
       { status: 401 }
     );
   }
@@ -42,7 +42,7 @@ export async function GET() {
     if (list.length === 0) {
       return NextResponse.json<IListGroupsResponse>({
         success: true,
-        msg: 'OK',
+        msg: 'Успешно',
         data: {
           total: 0,
           list: [],
@@ -100,7 +100,7 @@ export async function GET() {
 
     return NextResponse.json<IListGroupsResponse>({
       success: true,
-      msg: 'OK',
+      msg: 'Успешно',
       data: {
         total: list.length,
         list,
@@ -108,7 +108,7 @@ export async function GET() {
     });
   } catch {
     return NextResponse.json<IListGroupsResponse>(
-      { success: false, msg: 'Failed to fetch groups', data: emptyData },
+      { success: false, msg: 'Не удалось получить список групп', data: emptyData },
       { status: 500 }
     );
   }

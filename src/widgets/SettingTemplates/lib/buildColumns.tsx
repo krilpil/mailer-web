@@ -18,7 +18,7 @@ const formatUnix = (value: number) => {
 
 export const buildTemplatesColumns: BuildTemplatesColumns = ({ deletingTemplateId, onRemove }) => [
   {
-    title: 'ID шаблона',
+    title: 'Идентификатор шаблона',
     dataIndex: 'template_id',
     key: 'template_id',
     width: 120,

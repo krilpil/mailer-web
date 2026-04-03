@@ -37,7 +37,7 @@ export const MailingPage = () => {
 
       const savedTemplateId = response.data?.template_id;
       const successMessage = savedTemplateId
-        ? `Шаблон сохранен (ID: ${savedTemplateId})`
+        ? `Шаблон сохранен (идентификатор: ${savedTemplateId})`
         : 'Шаблон сохранен';
 
       setSaveResult({

@@ -33,7 +33,7 @@ export const CreateDomainValue: FC<CreateDomainValueProps> = ({ onSubmit }) => {
 
   return (
     <Form layout="vertical" onFinish={handleSubmit}>
-      <p>Только домен, без www и http. Например &#34;example.com&#34;</p>
+      <p>Только домен, без www и http. Например &#34;domen.ru&#34;</p>
 
       <Form.Item validateStatus={validateStatus} help={domainError}>
         <Input
@@ -41,7 +41,7 @@ export const CreateDomainValue: FC<CreateDomainValueProps> = ({ onSubmit }) => {
           value={values.domain}
           onChange={handleChange}
           onBlur={handleBlur}
-          placeholder="example.com"
+          placeholder="domen.ru"
         />
       </Form.Item>
 

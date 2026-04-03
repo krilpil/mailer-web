@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IListResponse>(
-      { success: false, msg: 'Unauthorized', data: emptyList },
+      { success: false, msg: 'Требуется авторизация', data: emptyList },
       { status: 401 }
     );
   }
@@ -37,20 +37,20 @@ export async function GET(request: Request) {
     );
   } catch {
     return NextResponse.json<IListResponse>(
-      { success: false, msg: 'Failed to fetch account domains', data: emptyList },
+      { success: false, msg: 'Не удалось получить список доменов аккаунта', data: emptyList },
       { status: 500 }
     );
   }
 
   if (allowedDomains.size === 0) {
-    return NextResponse.json<IListResponse>({ success: true, msg: 'OK', data: emptyList });
+    return NextResponse.json<IListResponse>({ success: true, msg: 'Успешно', data: emptyList });
   }
 
   return fetchDomainsList(page)
     .then((body) => {
       if (!body?.success) {
         return NextResponse.json<IListResponse>(
-          { success: body.success, msg: body.msg, data: emptyList },
+          { success: body.success, msg: 'Не удалось получить список доменов', data: emptyList },
           { status: 500 }
         );
       }
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
 
       return NextResponse.json<IListResponse>({
         success: true,
-        msg: body.msg,
+        msg: 'Успешно',
         data: {
           total: filteredList.length,
           list: filteredList,
@@ -71,13 +71,13 @@ export async function GET(request: Request) {
     .catch((error) => {
       if (error instanceof AxiosError) {
         return NextResponse.json<IListResponse>(
-          { msg: error.response?.data?.error, success: false, data: emptyList },
+          { msg: 'Не удалось получить список доменов', success: false, data: emptyList },
           { status: 500 }
         );
       }
 
       return NextResponse.json<IListResponse>(
-        { msg: 'An unhandled error', success: false, data: emptyList },
+        { msg: 'Необработанная ошибка', success: false, data: emptyList },
         { status: 500 }
       );
     });

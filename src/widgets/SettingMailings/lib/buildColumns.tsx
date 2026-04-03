@@ -38,10 +38,10 @@ type BuildMailingTasksColumns = (args: {
 
 export const buildMailingTasksColumns: BuildMailingTasksColumns = ({ onOpenAnalytics }) => [
   {
-    title: 'ID',
+    title: '№',
     dataIndex: 'id',
     key: 'id',
-    width: 90,
+    width: 40,
   },
   {
     title: 'Тема',
@@ -93,12 +93,6 @@ export const buildMailingTasksColumns: BuildMailingTasksColumns = ({ onOpenAnaly
     dataIndex: 'start_time',
     key: 'start_time',
     render: (startTime: number) => formatUnix(startTime),
-  },
-  {
-    title: 'Создана',
-    dataIndex: 'create_time',
-    key: 'create_time',
-    render: (createTime: number) => formatUnix(createTime),
   },
   {
     key: 'analytics',

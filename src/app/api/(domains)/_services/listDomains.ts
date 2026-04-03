@@ -21,14 +21,14 @@ export const fetchDomainsList = async (page: number): Promise<IListResponse> => 
   if (!body?.success) {
     return {
       success: body?.success ?? false,
-      msg: body?.msg ?? 'Failed to fetch domains',
+      msg: 'Не удалось получить список доменов',
       data: { total: 0, list: [] },
     };
   }
 
   return {
     success: body.success,
-    msg: body.msg,
+    msg: 'Успешно',
     data: {
       total: body.data.total,
       list: body.data.list.map(({ domain, create_time, active, mailboxes, dns_records }) => ({

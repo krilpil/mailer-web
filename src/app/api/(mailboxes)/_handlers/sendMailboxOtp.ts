@@ -25,7 +25,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
       return NextResponse.json(
         {
           success: false,
-          msg: mailBody?.msg ?? 'Failed to send OTP email',
+          msg: 'Не удалось отправить код подтверждения',
           error: 'mail_failed',
         },
         { status: 500 }
@@ -36,7 +36,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
       return NextResponse.json(
         {
           success: false,
-          msg: error.response?.data?.error ?? 'Failed to send OTP email',
+          msg: 'Не удалось отправить код подтверждения',
           error: 'mail_failed',
         },
         { status: 500 }
@@ -44,7 +44,7 @@ const sendOtpEmail = async (payload: ISendMailPayload) => {
     }
 
     return NextResponse.json(
-      { success: false, msg: 'Failed to send OTP email', error: 'mail_failed' },
+      { success: false, msg: 'Не удалось отправить код подтверждения', error: 'mail_failed' },
       { status: 500 }
     );
   }
@@ -67,11 +67,14 @@ export async function POST(request: Request) {
   const session = await auth();
   const accountId = session?.user?.id;
   if (!accountId) {
-    return NextResponse.json({ success: false, msg: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ success: false, msg: 'Требуется авторизация' }, { status: 401 });
   }
 
   if (parsed.local_part.includes('@')) {
-    return NextResponse.json({ success: false, msg: 'Invalid local part' }, { status: 400 });
+    return NextResponse.json(
+      { success: false, msg: 'Некорректная часть адреса до символа @' },
+      { status: 400 }
+    );
   }
 
   const normalizedDomain = parsed.domain.toLowerCase();
@@ -85,13 +88,13 @@ export async function POST(request: Request) {
 
     if ((rows as Array<unknown>).length === 0) {
       return NextResponse.json(
-        { success: false, msg: 'Domain is not available', error: 'domain_access_denied' },
+        { success: false, msg: 'Домен недоступен', error: 'domain_access_denied' },
         { status: 403 }
       );
     }
   } catch {
     return NextResponse.json(
-      { success: false, msg: 'Failed to check domain access', error: 'domain_access_failed' },
+      { success: false, msg: 'Не удалось проверить доступ к домену', error: 'domain_access_failed' },
       { status: 500 }
     );
   }
@@ -120,6 +123,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json<ISendOTPCreateMailboxResponse>(response);
   } catch {
-    return NextResponse.json({ success: false, msg: 'Failed to create OTP' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, msg: 'Не удалось создать код подтверждения' },
+      { status: 500 }
+    );
   }
 }

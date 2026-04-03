@@ -40,6 +40,7 @@ export const SettingTemplates = () => {
         dataSource={templatesList.data || []}
         pagination={false}
         loading={templatesList.isFetching}
+        scroll={{ x: 880 }}
       />
 
       {templatesList.isError ? (

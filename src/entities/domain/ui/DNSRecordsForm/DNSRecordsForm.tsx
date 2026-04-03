@@ -1,5 +1,5 @@
 import React from 'react';
 
 export const DNSRecordsForm = () => {
-  return <div>DNSRecordsForm</div>;
+  return <div>Форма DNS-записей</div>;
 };

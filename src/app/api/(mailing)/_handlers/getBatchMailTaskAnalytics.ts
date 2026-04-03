@@ -96,10 +96,11 @@ const normalizeWarning = (prefix: string, error: unknown): string => {
         ? (error.response.data as IProviderErrorPayload)
         : undefined;
 
-    return `${prefix}: ${providerError?.msg ?? providerError?.error ?? 'provider request failed'}`;
+    void providerError;
+    return `${prefix}: ошибка запроса к провайдеру`;
   }
 
-  return `${prefix}: request failed`;
+  return `${prefix}: запрос завершился ошибкой`;
 };
 
 const parseQuery = async (
@@ -129,14 +130,21 @@ const parseQuery = async (
     return { data };
   } catch (error) {
     if (error instanceof ValidationError) {
-      const message = error.errors.length ? error.errors.join(', ') : 'Validation error';
       return {
-        error: buildErrorResponse(message, 400, 'batch_mail_task_analytics_invalid_query'),
+        error: buildErrorResponse(
+          'Некорректные параметры запроса',
+          400,
+          'batch_mail_task_analytics_invalid_query'
+        ),
       };
     }
 
     return {
-      error: buildErrorResponse('Validation error', 400, 'batch_mail_task_analytics_invalid_query'),
+      error: buildErrorResponse(
+        'Некорректные параметры запроса',
+        400,
+        'batch_mail_task_analytics_invalid_query'
+      ),
     };
   }
 };
@@ -149,7 +157,7 @@ export async function GET(request: Request) {
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
-    return buildErrorResponse('Mail API is not configured');
+    return buildErrorResponse('Почтовый API не настроен');
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -201,8 +209,8 @@ export async function GET(request: Request) {
     }
 
     if (!body?.success) {
-      warnings.push(`Графики аналитики: ${body?.msg ?? 'provider request failed'}`);
-      firstProviderError = firstProviderError || (body?.msg ?? 'provider request failed');
+      warnings.push('Графики аналитики: ошибка запроса к провайдеру');
+      firstProviderError = firstProviderError || 'Не удалось получить аналитику задачи';
     } else {
       const data = toObject(body.data);
       statChart = {
@@ -227,8 +235,8 @@ export async function GET(request: Request) {
     }
 
     if (!body?.success) {
-      warnings.push(`Статистика провайдеров: ${body?.msg ?? 'provider request failed'}`);
-      firstProviderError = firstProviderError || (body?.msg ?? 'provider request failed');
+      warnings.push('Статистика провайдеров: ошибка запроса к провайдеру');
+      firstProviderError = firstProviderError || 'Не удалось получить аналитику задачи';
     } else {
       mailProvider = body.data ?? null;
     }
@@ -245,8 +253,8 @@ export async function GET(request: Request) {
     }
 
     if (!body?.success) {
-      warnings.push(`Логи отправки: ${body?.msg ?? 'provider request failed'}`);
-      firstProviderError = firstProviderError || (body?.msg ?? 'provider request failed');
+      warnings.push('Логи отправки: ошибка запроса к провайдеру');
+      firstProviderError = firstProviderError || 'Не удалось получить аналитику задачи';
     } else {
       const list = Array.isArray(body.data?.list)
         ? body.data?.list.map((item) => normalizeLogItem(item))
@@ -274,7 +282,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json<IGetBatchMailTaskAnalyticsResponse>({
     success: true,
-    msg: warnings.length ? 'Часть аналитики недоступна' : 'OK',
+    msg: warnings.length ? 'Часть аналитики недоступна' : 'Успешно',
     code: firstProviderCode,
     data: {
       task_id: queryResult.data.task_id,

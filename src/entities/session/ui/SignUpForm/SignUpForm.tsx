@@ -19,8 +19,14 @@ import {
 import { SignUpFormProps, SignUpFormValues } from '../../model/signUpForm.types';
 
 const validationSchema = yup.object({
-  email: yup.string().email('Введите корректный email').required('Укажите email'),
-  password: yup.string().required('Введите пароль'),
+  email: yup
+    .string()
+    .email('Введите корректный адрес электронной почты')
+    .required('Укажите адрес электронной почты'),
+  password: yup
+    .string()
+    .min(6, 'Пароль должен содержать минимум 6 символов')
+    .required('Введите пароль'),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'Пароли не совпадают')
@@ -53,7 +59,7 @@ export const SignUpForm = ({ onSubmitAction, error }: SignUpFormProps) => {
         <SStyledInput
           id="email"
           name="email"
-          placeholder="you@company.com"
+          placeholder="Введите почтовый адрес"
           value={formik.values.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}

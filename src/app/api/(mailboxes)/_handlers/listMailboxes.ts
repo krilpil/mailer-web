@@ -13,7 +13,7 @@ export async function GET() {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IListMailboxesResponse>(
-      { success: false, msg: 'Unauthorized', data: emptyList },
+      { success: false, msg: 'Требуется авторизация', data: emptyList },
       { status: 401 }
     );
   }
@@ -32,7 +32,7 @@ export async function GET() {
     domains = Array.from(new Set(rawDomains));
   } catch {
     return NextResponse.json<IListMailboxesResponse>(
-      { success: false, msg: 'Failed to fetch account domains', data: emptyList },
+      { success: false, msg: 'Не удалось получить список доменов аккаунта', data: emptyList },
       { status: 500 }
     );
   }
@@ -40,7 +40,7 @@ export async function GET() {
   if (domains.length === 0) {
     return NextResponse.json<IListMailboxesResponse>({
       success: true,
-      msg: 'OK',
+      msg: 'Успешно',
       data: emptyList,
     });
   }
@@ -52,7 +52,7 @@ export async function GET() {
     responses.forEach((response) => {
       const body = response.data;
       if (!body?.success) {
-        throw new Error(body?.msg ?? 'Failed to fetch mailboxes');
+        throw new Error('Не удалось получить список почтовых ящиков');
       }
 
       (body.data ?? []).forEach((mailbox) => {
@@ -73,7 +73,7 @@ export async function GET() {
 
     return NextResponse.json<IListMailboxesResponse>({
       success: true,
-      msg: 'OK',
+      msg: 'Успешно',
       data: {
         total: list.length,
         list,
@@ -84,16 +84,15 @@ export async function GET() {
       return NextResponse.json<IListMailboxesResponse>(
         {
           success: false,
-          msg: error.response?.data?.error ?? 'Failed to fetch mailboxes',
+          msg: 'Не удалось получить список почтовых ящиков',
           data: emptyList,
         },
         { status: 500 }
       );
     }
 
-    const message = error instanceof Error ? error.message : 'Failed to fetch mailboxes';
     return NextResponse.json<IListMailboxesResponse>(
-      { success: false, msg: message, data: emptyList },
+      { success: false, msg: 'Не удалось получить список почтовых ящиков', data: emptyList },
       { status: 500 }
     );
   }

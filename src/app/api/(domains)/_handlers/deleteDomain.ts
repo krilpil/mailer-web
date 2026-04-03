@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json(
-      { success: false, msg: 'Mail API is not configured', error: 'domain_delete_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'domain_delete_failed' },
       { status: 500 }
     );
   }
@@ -49,8 +49,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: listBody?.msg ?? 'Failed to fetch mailboxes',
-          error: listBody?.error ?? 'mailbox_list_failed',
+          msg: 'Не удалось получить список почтовых ящиков',
+          error: 'mailbox_list_failed',
         },
         { status: 500 }
       );
@@ -64,10 +64,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to fetch mailboxes',
+          msg: 'Не удалось получить список почтовых ящиков',
           error: 'mailbox_list_failed',
         },
         { status: 500 }
@@ -75,7 +72,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: false, msg: 'Failed to fetch mailboxes', error: 'mailbox_list_failed' },
+      {
+        success: false,
+        msg: 'Не удалось получить список почтовых ящиков',
+        error: 'mailbox_list_failed',
+      },
       { status: 500 }
     );
   }
@@ -89,8 +90,8 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             success: false,
-            msg: deleteBody?.msg ?? 'Failed to delete mailboxes',
-            error: deleteBody?.error ?? 'mailbox_delete_failed',
+            msg: 'Не удалось удалить почтовые ящики',
+            error: 'mailbox_delete_failed',
           },
           { status: 500 }
         );
@@ -100,10 +101,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             success: false,
-            msg:
-              error.response?.data?.error ??
-              error.response?.data?.msg ??
-              'Failed to delete mailboxes',
+            msg: 'Не удалось удалить почтовые ящики',
             error: 'mailbox_delete_failed',
           },
           { status: 500 }
@@ -111,7 +109,11 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(
-        { success: false, msg: 'Failed to delete mailboxes', error: 'mailbox_delete_failed' },
+        {
+          success: false,
+          msg: 'Не удалось удалить почтовые ящики',
+          error: 'mailbox_delete_failed',
+        },
         { status: 500 }
       );
     }
@@ -125,8 +127,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg: deleteBody?.msg ?? 'Failed to delete domain',
-          error: deleteBody?.error ?? 'domain_delete_failed',
+          msg: 'Не удалось удалить домен',
+          error: 'domain_delete_failed',
         },
         { status: 500 }
       );
@@ -136,10 +138,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          msg:
-            error.response?.data?.error ??
-            error.response?.data?.msg ??
-            'Failed to delete domain',
+          msg: 'Не удалось удалить домен',
           error: 'domain_delete_failed',
         },
         { status: 500 }
@@ -147,11 +146,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: false, msg: 'Failed to delete domain', error: 'domain_delete_failed' },
+      { success: false, msg: 'Не удалось удалить домен', error: 'domain_delete_failed' },
       { status: 500 }
     );
   }
 
-  const response: IDeleteDomainResponse = { success: true, msg: 'OK' };
+  const response: IDeleteDomainResponse = { success: true, msg: 'Успешно' };
   return NextResponse.json<IDeleteDomainResponse>(response);
 }

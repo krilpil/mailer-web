@@ -695,7 +695,7 @@ export const ViewMailingTaskAnalytics = ({
           <Descriptions.Item label="Запланирован старт">
             {formatUnix(task.start_time)}
           </Descriptions.Item>
-          <Descriptions.Item label="Шаблон ID">{task.template_id}</Descriptions.Item>
+          <Descriptions.Item label="Идентификатор шаблона">{task.template_id}</Descriptions.Item>
           <Descriptions.Item label="Период аналитики">
             {`${formatUnix(period.start)} - ${formatUnix(period.end)}`}
           </Descriptions.Item>

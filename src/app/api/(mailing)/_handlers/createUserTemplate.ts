@@ -81,11 +81,11 @@ export async function POST(request: Request) {
   const session = await auth();
   const accountId = session?.user?.id;
   if (!accountId) {
-    return buildErrorResponse('Unauthorized', 401, 'email_template_access_denied');
+    return buildErrorResponse('Требуется авторизация', 401, 'email_template_access_denied');
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
-    return buildErrorResponse('Mail API is not configured');
+    return buildErrorResponse('Почтовый API не настроен');
   }
 
   const templateName = parsedResult.data.template_name.trim();
@@ -126,9 +126,9 @@ export async function POST(request: Request) {
 
     if (!providerBody?.success) {
       return buildErrorResponse(
-        providerBody?.msg ?? 'Failed to create template',
+        'Не удалось создать шаблон',
         500,
-        providerBody?.error ?? 'email_template_create_failed',
+        'email_template_create_failed',
         providerCode
       );
     }
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
     createdTemplateId = extractTemplateId(providerBody);
     if (!createdTemplateId) {
       return buildErrorResponse(
-        'Template id was not returned',
+        'Сервис не вернул идентификатор шаблона',
         500,
         'email_template_create_failed',
         providerCode
@@ -159,7 +159,7 @@ export async function POST(request: Request) {
       await rollbackTemplateCreation();
 
       return buildErrorResponse(
-        'Failed to save template',
+        'Не удалось сохранить шаблон',
         500,
         'account_template_create_failed',
         providerCode
@@ -168,7 +168,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json<ICreateTemplateResponse>({
       success: true,
-      msg: providerBody.msg ?? 'OK',
+      msg: 'Успешно',
       code: providerCode,
       data: {
         template_id: createdTemplateId,
@@ -182,13 +182,13 @@ export async function POST(request: Request) {
       const providerError = toProviderErrorPayload(error);
 
       return buildErrorResponse(
-        providerError?.error ?? providerError?.msg ?? 'Failed to create template',
+        'Не удалось создать шаблон',
         500,
-        providerError?.error ?? 'email_template_create_failed',
+        'email_template_create_failed',
         toProviderCode(providerError?.code)
       );
     }
 
-    return buildErrorResponse('Failed to create template');
+    return buildErrorResponse('Не удалось создать шаблон');
   }
 }

@@ -86,8 +86,8 @@ export const CreateDomainOtpEmail = ({ email, otpCode }: CreateDomainOtpEmailPro
             Подтвердите свой адрес электронной почты отправителя
           </Heading>
           <Text style={textStyle}>
-            Используйте OTP-код, указанный ниже, чтобы подтвердить {email} и начать отправку
-            тестового электронного письма или рассылок. Этот код действителен в течение 5 минут.
+            Используйте код подтверждения ниже, чтобы подтвердить {email} и начать отправку
+            тестового письма или рассылок. Этот код действует в течение 5 минут.
           </Text>
           <Section style={codeContainerStyle}>
             <Text style={codeStyle}>{otpCode}</Text>

@@ -55,7 +55,7 @@ const collectGroupContactIds = async (groupId: number): Promise<string[]> => {
     const providerBody = providerResponse.data;
 
     if (!providerBody?.success) {
-      throw new Error(providerBody?.msg ?? 'Failed to fetch group contacts');
+      throw new Error('Не удалось получить список пользователей группы');
     }
 
     const providerList = Array.isArray(providerBody.data?.list) ? providerBody.data.list : [];
@@ -85,7 +85,7 @@ const deleteGroupInProvider = async (
     if (!providerBody?.success) {
       return {
         success: false,
-        message: providerBody?.msg ?? providerBody?.error ?? 'Failed to delete group',
+        message: 'Не удалось удалить группу',
       };
     }
 
@@ -93,7 +93,7 @@ const deleteGroupInProvider = async (
     if (failedCount > 0) {
       return {
         success: false,
-        message: providerBody?.msg ?? 'Failed to delete group',
+        message: 'Не удалось удалить группу',
       };
     }
 
@@ -109,7 +109,7 @@ const deleteGroupInProvider = async (
 
   return {
     success: false,
-    message: 'Group still exists in provider after delete',
+    message: 'Группа осталась у провайдера после удаления',
   };
 };
 
@@ -129,14 +129,14 @@ export async function POST(request: Request) {
   const accountId = session?.user?.id;
   if (!accountId) {
     return NextResponse.json<IDeleteGroupResponse>(
-      { success: false, msg: 'Unauthorized' },
+      { success: false, msg: 'Требуется авторизация' },
       { status: 401 }
     );
   }
 
   if (!process.env.BILLION_MAIL_API || !process.env.BILLION_MAIL_TOKEN) {
     return NextResponse.json<IDeleteGroupResponse>(
-      { success: false, msg: 'Mail API is not configured', error: 'contact_group_delete_failed' },
+      { success: false, msg: 'Почтовый API не настроен', error: 'contact_group_delete_failed' },
       { status: 500 }
     );
   }
@@ -150,7 +150,7 @@ export async function POST(request: Request) {
 
     if ((rows as Array<unknown>).length === 0) {
       return NextResponse.json<IDeleteGroupResponse>(
-        { success: false, msg: 'Group is not available', error: 'contact_group_access_denied' },
+        { success: false, msg: 'Группа недоступна', error: 'contact_group_access_denied' },
         { status: 403 }
       );
     }
@@ -158,7 +158,7 @@ export async function POST(request: Request) {
     return NextResponse.json<IDeleteGroupResponse>(
       {
         success: false,
-        msg: 'Failed to check group access',
+        msg: 'Не удалось проверить доступ к группе',
         error: 'contact_group_delete_failed',
       },
       { status: 500 }
@@ -177,8 +177,8 @@ export async function POST(request: Request) {
         return NextResponse.json<IDeleteGroupResponse>(
           {
             success: false,
-            msg: deleteContactsBody?.msg ?? 'Failed to delete group recipients',
-            error: deleteContactsBody?.error ?? 'contact_group_delete_failed',
+            msg: 'Не удалось удалить пользователей группы',
+            error: 'contact_group_delete_failed',
           },
           { status: 500 }
         );
@@ -201,7 +201,7 @@ export async function POST(request: Request) {
       return NextResponse.json<IDeleteGroupResponse>(
         {
           success: false,
-          msg: error.response?.data?.error ?? error.response?.data?.msg ?? 'Failed to delete group',
+          msg: 'Не удалось удалить группу',
           error: 'contact_group_delete_failed',
         },
         { status: 500 }
@@ -209,7 +209,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json<IDeleteGroupResponse>(
-      { success: false, msg: 'Failed to delete group', error: 'contact_group_delete_failed' },
+      { success: false, msg: 'Не удалось удалить группу', error: 'contact_group_delete_failed' },
       { status: 500 }
     );
   }
@@ -222,11 +222,15 @@ export async function POST(request: Request) {
     );
   } catch {
     return NextResponse.json<IDeleteGroupResponse>(
-      { success: false, msg: 'Failed to delete local group', error: 'contact_group_delete_failed' },
+      {
+        success: false,
+        msg: 'Не удалось удалить группу в локальной базе',
+        error: 'contact_group_delete_failed',
+      },
       { status: 500 }
     );
   }
 
-  const response: IDeleteGroupResponse = { success: true, msg: 'OK' };
+  const response: IDeleteGroupResponse = { success: true, msg: 'Успешно' };
   return NextResponse.json<IDeleteGroupResponse>(response);
 }

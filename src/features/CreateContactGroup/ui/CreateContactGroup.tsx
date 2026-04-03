@@ -193,9 +193,9 @@ export const CreateContactGroup = () => {
           <Form.Item name="recipients" label="Пользователи (вручную, опционально)">
             <Input.TextArea
               rows={8}
-              placeholder={`one@example.com
-two@example.com
-three@example.com`}
+              placeholder={`адрес1@домен.рф
+адрес2@домен.рф
+адрес3@домен.рф`}
             />
           </Form.Item>
 
