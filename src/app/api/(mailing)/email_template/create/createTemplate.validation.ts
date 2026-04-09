@@ -6,7 +6,18 @@ export const createTemplatePayloadValidate: ObjectSchema<ICreateTemplatePayload>
   template_name: string().trim().required(),
   content: mixed()
     .test('is-object', 'Содержимое шаблона должно быть объектом', (value) => {
-      return typeof value === 'object' && value !== null;
+      return value === undefined || (typeof value === 'object' && value !== null);
     })
-    .required(),
-}).required();
+    .optional(),
+  html_content: string()
+    .test('not-empty', 'HTML шаблон не должен быть пустым', (value) => {
+      return value === undefined || value.trim().length > 0;
+    })
+    .optional(),
+})
+  .test(
+    'content-or-html',
+    'Нужно передать content или html_content',
+    (value) => Boolean(value?.content) || Boolean(value?.html_content?.trim())
+  )
+  .required();

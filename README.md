@@ -26,7 +26,7 @@
   - `GET /api/batch_mail/task/list` возвращает только задачи, доступные текущему пользователю (по ownership в `account_template`, `account_recipient`, `account_mailbox`, `account_domain`).
   - `GET /api/batch_mail/task/analytics` агрегирует аналитику задачи из BillionMail: графики (`/batch_mail/task/stat_chart`), статистику провайдеров (`/batch_mail/tracking/mail_provider`) и логи (`/batch_mail/tracking/logs`).
   - `GET /api/analytics/domains` и `GET /api/analytics/mailboxes` возвращают агрегаты только по данным текущего пользователя (`account_id` из сессии + фильтрация по `account_domain`/`account_mailbox`).
-  - `POST /api/email_template/create` создаёт шаблон в BillionMail и сохраняет связь пользователя с шаблоном в `account_template`.
+  - `POST /api/email_template/create` создаёт шаблон в BillionMail (из `content` редактора или из raw `html_content`) и сохраняет связь пользователя с шаблоном в `account_template`.
   - `GET /api/email_template/list` и `POST /api/email_template/delete` работают только с шаблонами текущего пользователя (по `account_template`).
 - `src/screens/` — страницы (слой экранов).
 - `src/widgets/` — составные UI-блоки.

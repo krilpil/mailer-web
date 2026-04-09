@@ -2,7 +2,8 @@ import { JSONContent } from '@tiptap/core';
 
 export interface ICreateTemplatePayload {
   template_name: string;
-  content: JSONContent;
+  content?: JSONContent;
+  html_content?: string;
 }
 
 export interface ICreateTemplateResponse {

@@ -10,6 +10,8 @@ export const routes = {
   CONTACTS_PAGE: '/contacts',
   MAILBOXES_PAGE: '/mailboxes',
   SETTINGS_PAGE: '/settings',
+
+  SUPPORT_PAGE: 'https://t.me/Mailfinch',
 } as const;
 
 export const publicRoutes: string[] = [routes.AUTH_PAGE, routes.REGISTER_PAGE, routes.NOT_FOUND];

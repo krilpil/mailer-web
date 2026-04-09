@@ -16,6 +16,7 @@
 - Закрыта задача по заголовкам вкладок: для всех страниц App Router добавлены `metadata.title`, а в `src/app/layout.tsx` включен `title.template` (`%s | Mailfinch Core`).
 - Повторная проверка подтвердила, что после добавления page-title прод-сборка проходит: `yarn build:prod` успешно завершён.
 - Проверка истории изменений: `git log 507610a..HEAD` содержит коммит `08f2133 feat(analytic): добавлена страница с аналитикой`; `last_checked_commit` обновлён.
+- Повторная проверка истории изменений: `git log 08f2133..HEAD` содержит коммит `7db2d0a feat: переработан дизайн`; `last_checked_commit` обновлён до `7db2d0a`.
 - Закрыт свежий блокер `yarn build:prod`: в `SettingAnalytics` устранен конфликт типов `Dayjs` при работе `RangePicker` (state диапазона переведен на Unix-метки).
 - Повторная сборка подтверждена: `yarn build:prod` успешно проходит (`compile + TypeScript + prerender`).
 - Закрыт блокер сборки: `npm run build:prod` проходит успешно (Next.js compile + TypeScript + prerender).
@@ -29,6 +30,8 @@
 - Страница `/mailing` переведена в режим `Новый шаблон`: создание шаблона в BillionMail + запись связи шаблона с пользователем в `account_template`.
 - При сохранении шаблона в `account_template` теперь также сохраняется JSONContent редактора в колонку `template` (JSON-строка).
 - Добавлена страница `/templates` (`Список шаблонов`) с таблицей и удалением шаблонов текущего пользователя.
+- На `/templates` добавлена feature загрузки raw HTML-шаблона: кнопка у заголовка открывает модальное окно (`template_name + .html/.htm`), сохранение идёт через `POST /api/email_template/create`, новый шаблон сразу отображается в списке текущего пользователя.
+- Контракт `POST /api/email_template/create` расширен: endpoint принимает `content` или `html_content` (минимум одно поле), а `useCreateUserTemplate` теперь рефетчит `GET /api/email_template/list` после успешного создания.
 - На странице `/mailings` добавлена feature `Новая рассылка` (модальное окно выбора отправителя, групп и шаблона) с запуском task в режиме прогрева (`warmup=1`).
 - Добавлена новая приватная страница `/mailings` со списком batch-задач, фильтрами (`keyword`, `status`) и пагинацией.
 - На странице `/mailings` в таблицу задач добавлена колонка `Расчетное время` (`estimated_time_with_warmup`) с человекочитаемым форматированием длительности.
@@ -66,6 +69,7 @@
 - Добавлены серверные endpoint'ы `GET /api/email_template/list` и `POST /api/email_template/delete` (проверка ownership через `account_template`).
 - Добавлен клиентский хук `useCreateUserTemplate`; `MailingPage` теперь сохраняет шаблон вместо создания task.
 - Добавлены клиентские хуки `useGetUserTemplatesList` и `useDeleteUserTemplate`; таблица `/templates` подключена к ним.
+- На странице `/templates` добавлена feature `UploadHtmlTemplate`: отдельная кнопка у заголовка и модальное окно загрузки HTML-шаблона (`template_name + html file`).
 - Добавлена feature `CreateMailingTask` в `SettingMailings`: создание batch-задач по выбранным группам через `useCreateBatchMailTask` с `warmup=1`.
 - В таблице `/mailings` добавлена колонка `Расчетное время` из `estimated_time_with_warmup`.
 - Реализована feature `Аналитика задачи` на `/mailings` (кнопка в строке + модальное окно с dashboard/провайдерами/логами).
@@ -179,6 +183,7 @@
 - Добавлена страница `Список шаблонов` с удалением; выводятся только шаблоны пользователя из `account_template`.
 - На странице `Рассылки` добавлена кнопка `Новая рассылка` с модальным окном и запуском задач рассылки в режиме прогрева.
 - В `POST /api/email_template/create` добавлена запись ownership в `account_template` с `account_id` текущего пользователя.
+- `POST /api/email_template/create` расширен поддержкой `html_content` (raw HTML) наряду с `content`; на `/templates` добавлена feature-модалка загрузки HTML, при этом `SettingTemplates` оставлен только для таблицы списка/удаления.
 - В `POST /api/batch_mail/task/create` изменён контракт: вместо `template_id` клиент передаёт `content` из `MailerEditor`; сервер создаёт временный template, создаёт задачу рассылки и удаляет template.
 - На `/mailing` удалён input `template_id`; пользователь формирует письмо только в редакторе, контент идёт в batch-flow.
 - Исправлен кейс, когда `/api/batch_mail/task/list` возвращал данные, но UI показывал `Не удалось загрузить список рассылок`: клиентский слой больше не падает на частично несовпадающем контракте.
@@ -240,5 +245,5 @@
 
 ## Контроль изменений
 
-- last_checked_commit: 08f2133
+- last_checked_commit: 7db2d0a
 - last_checked_date: 2026-04-03

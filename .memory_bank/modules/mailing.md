@@ -27,6 +27,10 @@
 
 - На странице `/templates` отображается таблица шаблонов текущего пользователя.
 - Для каждой строки доступно удаление шаблона.
+- Справа от заголовка страницы доступна feature-кнопка `Загрузить HTML-файл`, которая открывает модальное окно:
+  - поле названия шаблона;
+  - загрузка `.html/.htm` файла;
+  - сохранение шаблона через `POST /api/email_template/create` (`html_content`).
 - Пункт меню: `Список шаблонов`.
 
 ## Create Task From Mailings
@@ -53,11 +57,12 @@
 - Клиент: `useCreateUserTemplate` (`src/entities/mailer/api/createUserTemplate`).
 - Сервер: `src/app/api/(mailing)/_handlers/createUserTemplate.ts`.
 - Шаги:
-  - валидация payload `{ template_name, content }`;
+  - валидация payload `{ template_name, content?, html_content? }` (обязателен хотя бы один источник контента);
   - проверка авторизации (`auth`);
-  - рендер `content` в HTML через `EmailTemplate` + `@react-email/render`;
+  - если передан `content`, рендер `content` в HTML через `EmailTemplate` + `@react-email/render`;
+  - если передан `html_content`, используется raw HTML как есть;
   - создание шаблона в BillionMail (`/api/email_template/create`);
-  - сохранение связи в PostgreSQL `account_template (account_id, template_id, template_name)` и JSON редактора в `account_template.template`;
+  - сохранение связи в PostgreSQL `account_template (account_id, template_id, template_name)` и исходного шаблона в `account_template.template`;
   - при ошибке сохранения в БД выполняется best-effort rollback через `/api/email_template/delete`.
 
 ## Template List/Delete Flow

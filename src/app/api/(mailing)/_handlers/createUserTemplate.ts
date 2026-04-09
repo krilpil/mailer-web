@@ -89,7 +89,19 @@ export async function POST(request: Request) {
   }
 
   const templateName = parsedResult.data.template_name.trim();
-  const serializedTemplate = JSON.stringify(parsedResult.data.content);
+  const customHtmlContent = parsedResult.data.html_content?.trim();
+  const structuredContent = parsedResult.data.content;
+
+  const hasCustomHtmlContent = Boolean(customHtmlContent);
+  const hasStructuredContent = typeof structuredContent === 'object' && structuredContent !== null;
+
+  if (!hasCustomHtmlContent && !hasStructuredContent) {
+    return buildErrorResponse('Содержимое шаблона не задано', 400, 'email_template_invalid_payload');
+  }
+
+  const serializedTemplate = hasCustomHtmlContent
+    ? customHtmlContent!
+    : JSON.stringify(structuredContent);
 
   let createdTemplateId: number | null = null;
   let isRollbackAttempted = false;
@@ -109,12 +121,14 @@ export async function POST(request: Request) {
   };
 
   try {
-    const htmlContent = await render(
-      EmailTemplate({
-        title: templateName,
-        content: parsedResult.data.content,
-      })
-    );
+    const htmlContent = hasCustomHtmlContent
+      ? customHtmlContent!
+      : await render(
+          EmailTemplate({
+            title: templateName,
+            content: structuredContent!,
+          })
+        );
 
     const providerResponse = await createEmailTemplate({
       temp_name: templateName,

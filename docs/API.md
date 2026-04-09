@@ -174,9 +174,12 @@ Example: `src/app/api/(auth)/sign-up/otp/route.ts` → `POST /api/sign-up/otp`.
 
 `POST /api/email_template/create`
 
-- Request: `{ template_name, content }` where `content` is TipTap `JSONContent` from `MailerEditor`.
+- Request: `{ template_name, content? , html_content? }` where:
+  - `content` is TipTap `JSONContent` from `MailerEditor`;
+  - `html_content` is raw HTML template string;
+  - at least one of `content` or `html_content` is required.
 - Response: `{ success, msg, code?, data? }` where `data` contains `{ template_id, template_name }`.
-- Notes: endpoint checks auth, renders `content` to HTML, creates template in BillionMail (`/api/email_template/create`) and stores template ownership in PostgreSQL table `account_template` for current `account_id`; raw editor payload is saved as JSON string in `account_template.template`.
+- Notes: endpoint checks auth, creates template in BillionMail (`/api/email_template/create`) and stores template ownership in PostgreSQL table `account_template` for current `account_id`; if `content` is provided, server renders it to HTML, if `html_content` is provided, server uses it as-is.
 
 `GET /api/email_template/list`
 

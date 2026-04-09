@@ -12,6 +12,7 @@ import {
   faPaperPlane,
   faPenToSquare,
   faRightFromBracket,
+  faHeadset,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MenuProps } from 'antd';
@@ -35,12 +36,17 @@ const navItems = [
   { href: routes.CONTACTS_PAGE, label: 'Контакты', icon: faAddressBook },
   { href: routes.MAILBOXES_PAGE, label: 'Почтовые ящики', icon: faInbox },
   { href: routes.SETTINGS_PAGE, label: 'Домены', icon: faGlobe },
+  { href: routes.SUPPORT_PAGE, label: 'Поддержка', icon: faHeadset, target: '_blank' },
 ];
 
 const menuItems: MenuProps['items'] = navItems.map((item) => ({
   key: item.href,
   icon: <FontAwesomeIcon icon={item.icon} fixedWidth />,
-  label: <Link href={item.href}>{item.label}</Link>,
+  label: (
+    <Link href={item.href} target={item.target ? item.target : undefined}>
+      {item.label}
+    </Link>
+  ),
 }));
 
 const resolveSelectedKey = (pathname: string): string => {

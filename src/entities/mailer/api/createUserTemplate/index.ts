@@ -2,13 +2,14 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { ValidationError } from 'yup';
 
-import { API, DetailsError } from '@/shared/api';
+import { API, DetailsError, queryClient } from '@/shared/api';
 
 import { createUserTemplateResponseValidate } from './createUserTemplate.validation';
 import {
   ICreateUserTemplatePayload,
   ICreateUserTemplateResponse,
 } from './createUserTemplate.types';
+import { getUserTemplatesListKey } from '../getUserTemplatesList';
 
 const createUserTemplateKey = 'createUserTemplate';
 
@@ -37,6 +38,9 @@ export const useCreateUserTemplate = () =>
   useMutation({
     mutationKey: [createUserTemplateKey],
     mutationFn: (payload: ICreateUserTemplatePayload) => createUserTemplate(payload),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: [getUserTemplatesListKey] });
+    },
   });
 
 export * from './createUserTemplate.types';

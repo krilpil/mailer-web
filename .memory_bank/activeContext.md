@@ -15,6 +15,7 @@
 - Клиентские хуки `useGetDomainsAnalytics` и `useGetMailboxesAnalytics`.
 - Страница `/mailing`: создание пользовательских шаблонов через `MailerEditor` и `useCreateUserTemplate`.
 - Страница `/templates`: список и удаление пользовательских шаблонов через таблицу.
+- Страница `/templates`: feature загрузки пользовательского raw HTML-шаблона через модальное окно у заголовка (сохранение в контексте текущего `account_id`).
 - Страница `/mailings`: запуск новой рассылки из модального окна (выбор отправителя, групп и шаблона).
 - Страница `/mailings`: список задач рассылки из `GET /api/batch_mail/task/list` (фильтры + пагинация).
 - Страница `/mailings`: feature аналитики задачи (кнопка в таблице + модальное окно с полной аналитикой).
@@ -81,6 +82,10 @@
 - На странице `/mailings` удалены фильтр `status` и колонка `Статус`: список теперь всегда запрашивается без `status` (по всем статусам), поиск остаётся по `keyword`.
 - Добавлена новая приватная страница `/templates` (`Список шаблонов`) с таблицей шаблонов текущего пользователя и удалением.
 - Добавлены endpoint'ы шаблонов: `GET /api/email_template/list` и `POST /api/email_template/delete` (ownership через `account_template`).
+- На `/templates` добавлена feature `UploadHtmlTemplate`: кнопка справа от заголовка `Список шаблонов` открывает модальное окно с полем `template_name`, загрузкой `.html/.htm` и сохранением через `POST /api/email_template/create`.
+- `SettingTemplates` возвращён к роли таблицы списка/удаления; вся логика загрузки HTML вынесена в отдельную feature.
+- `POST /api/email_template/create` расширен: endpoint принимает `content` или `html_content` (минимум одно поле), рендерит `content` в HTML только при необходимости и сохраняет исходный шаблон в `account_template.template`.
+- `useCreateUserTemplate` теперь рефетчит `getUserTemplatesList` после успешного сохранения, чтобы список шаблонов в UI обновлялся без ручного refresh.
 - В `SettingMailings` добавлена feature `Новая рассылка`: модальное окно создания task с `warmup=1` и выбором mailbox/groups/template.
 - На `/mailing` UI переименован в `Новый шаблон`: удалены controls получателей/отправителя и отправки рассылки, оставлено создание шаблона (`title + content`).
 - Добавлен endpoint `POST /api/email_template/create`: создание шаблона в BillionMail и сохранение связи `(account_id, template_id, template_name)` в `account_template`.
